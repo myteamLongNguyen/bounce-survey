@@ -1,0 +1,614 @@
+/*
+ * Everything is scoped under .brs-survey so the host theme cannot leak into
+ * the form and the form cannot leak out. When you have the Bounce brand
+ * values, the six tokens below are the only things you should need to change.
+ */
+
+.brs-survey {
+  --brs-ink: #16202b;
+  --brs-muted: #5c6b7a;
+  --brs-line: #d8dee5;
+  --brs-accent: #83465b;
+  --brs-accent-soft: #f2e7ea;
+  --brs-danger: #a3320b;
+  --brs-radius: 6px;
+  /* The soft backdrop behind the whole white card - the header block itself
+     is a solid --brs-accent, not this gradient. */
+  --brs-page-gradient: linear-gradient(135deg, #aab4d9 0%, #b98ea3 45%, #e0935f 100%);
+
+  --brs-font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --brs-font-display: var(--brs-font-body);
+
+  box-sizing: border-box;
+  /* Full-bleed: breaks out of whatever width the theme's content column
+     constrains this div to, so the gradient spans the whole viewport while
+     the header/footer above and below (which this div never touches) stay
+     exactly as the theme renders them on every other page. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 1.5rem 1.5rem 2.5rem;
+  background: var(--brs-page-gradient);
+  color: var(--brs-ink);
+  font-family: var(--brs-font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  text-align: left;
+}
+
+/* Belt and suspenders against theme leakage - Divi (and others) set a
+   heavier default font-weight on paragraph text that otherwise overrides
+   the inherited normal above on some elements. :where() keeps this at zero
+   added specificity, so the more specific bold rules below (.brs-heading,
+   .brs-intro-title, etc.) still win rather than being flattened by this. */
+.brs-survey :where(p, label, input, textarea, li) {
+  font-weight: 400;
+}
+
+.brs-survey *,
+.brs-survey *::before,
+.brs-survey *::after {
+  box-sizing: inherit;
+}
+
+.brs-header {
+  margin-bottom: 1.5rem;
+}
+
+.brs-heading {
+  margin: 0 0 0.5rem;
+  font-family: var(--brs-font-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--brs-ink);
+}
+
+.brs-body {
+  margin: 0 0 0.75rem;
+  color: var(--brs-muted);
+}
+
+.brs-body--muted {
+  font-size: 0.9rem;
+}
+
+/* The white card sitting on the page-level gradient ---------------------- */
+
+.brs-panel {
+  max-width: 70rem;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  padding: 1.75rem;
+  overflow: hidden;
+}
+
+/* Hero (first step only) -------------------------------------------------- */
+
+.brs-hero {
+  margin: -1.75rem -1.75rem 1.5rem;
+  padding: 1.75rem;
+  background: var(--brs-accent);
+}
+
+/* A white mat directly around the banner, sitting inside the coloured hero -
+   the accent colour shows on all sides of it, not a separate white bar. */
+.brs-banner-frame {
+  display: inline-block;
+  background: #fff;
+  padding: 0.6rem 0.9rem;
+  margin: 0 0 0.75rem;
+}
+
+.brs-banner {
+  display: block;
+  width: 100%;
+  max-width: 26rem;
+  height: auto;
+}
+
+@media (max-width: 480px) {
+  .brs-banner-frame {
+    display: block;
+  }
+
+  .brs-banner {
+    max-width: none;
+  }
+}
+
+.brs-heading--hero {
+  font-size: 2.25rem;
+  color: #fff;
+}
+
+.brs-body--hero {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.brs-body--italic {
+  font-style: italic;
+}
+
+.brs-intro {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.brs-intro-block {
+  margin-bottom: 1rem;
+}
+
+.brs-intro-title {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .brs-panel {
+    padding: 1.25rem;
+    border-radius: 0;
+  }
+
+  .brs-hero {
+    margin: -1.25rem -1.25rem 1.25rem;
+  }
+}
+
+.brs-form-note {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--brs-muted);
+}
+
+.brs-progress {
+  margin: 0 0 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brs-muted);
+}
+
+/* Questions ------------------------------------------------------------- */
+
+.brs-question {
+  margin: 0 0 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--brs-line);
+  border-radius: var(--brs-radius);
+  background: #fff;
+}
+
+.brs-question--missing {
+  border-color: var(--brs-danger);
+}
+
+.brs-legend {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.brs-number {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--brs-accent-soft);
+  color: var(--brs-accent);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5rem;
+  text-align: center;
+}
+
+.brs-question-text {
+  flex: 1;
+}
+
+.brs-subtext {
+  margin: 0 0 0.75rem 2.25rem;
+  font-size: 0.9rem;
+  color: var(--brs-muted);
+}
+
+.brs-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-left: 2.25rem;
+}
+
+.brs-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--brs-radius);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.brs-option:hover {
+  background: var(--brs-accent-soft);
+}
+
+.brs-option input {
+  flex: none;
+  margin: 0.3rem 0 0;
+  accent-color: var(--brs-accent);
+}
+
+/* Email ----------------------------------------------------------------- */
+
+.brs-email {
+  margin: 2rem 0 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--brs-line);
+  border-radius: var(--brs-radius);
+  background: var(--brs-accent-soft);
+}
+
+.brs-label {
+  display: block;
+  font-weight: 600;
+}
+
+.brs-email .brs-subtext {
+  margin-left: 0;
+}
+
+.brs-input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--brs-line);
+  border-radius: var(--brs-radius);
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+/* Honeypot — off-screen rather than display:none, which some bots detect. */
+.brs-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Actions and feedback -------------------------------------------------- */
+
+.brs-submit {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: var(--brs-radius);
+  background: var(--brs-accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.brs-submit:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.brs-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.brs-error,
+.brs-inline-error {
+  color: var(--brs-danger);
+  font-size: 0.9rem;
+}
+
+.brs-error {
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
+
+.brs-inline-error {
+  margin: 0.6rem 0 0 2.25rem;
+}
+
+.brs-panel--done {
+  padding: 2rem;
+  border-radius: 12px;
+}
+
+.brs-reference {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--brs-radius);
+  background: var(--brs-accent-soft);
+  color: var(--brs-accent);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+}
+
+/* Quality floor --------------------------------------------------------- */
+
+.brs-survey :focus-visible {
+  outline: 2px solid var(--brs-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .brs-survey {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .brs-subtext,
+  .brs-options,
+  .brs-inline-error {
+    margin-left: 0;
+  }
+
+  .brs-submit {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brs-survey * {
+    transition: none !important;
+  }
+}
+
+/* Wizard, question types --------------------------------------------------
+   Appended for the 58-question multi-section form. */
+
+.brs-progress {
+  margin: 0 0 1.5rem;
+}
+
+.brs-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brs-muted);
+}
+
+.brs-progress-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--brs-line);
+  overflow: hidden;
+}
+
+.brs-progress-fill {
+  height: 100%;
+  background: var(--brs-accent);
+  transition: width 0.25s ease;
+}
+
+.brs-section-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.brs-optional {
+  font-weight: 400;
+  color: var(--brs-muted);
+}
+
+.brs-hint {
+  margin: 0 0 0.6rem 2.25rem;
+  font-size: 0.85rem;
+  color: var(--brs-muted);
+}
+
+.brs-option--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.brs-option--disabled:hover {
+  background: none;
+}
+
+/* Likert ---------------------------------------------------------------- */
+
+.brs-likert-scroll {
+  margin-left: 2.25rem;
+  overflow-x: auto;
+}
+
+.brs-likert {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.brs-likert th,
+.brs-likert td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--brs-line);
+  text-align: center;
+}
+
+.brs-likert thead th {
+  vertical-align: bottom;
+  font-weight: 600;
+  color: var(--brs-muted);
+}
+
+.brs-likert tbody th {
+  min-width: 14rem;
+  font-weight: 400;
+  text-align: left;
+}
+
+.brs-likert tbody tr:hover {
+  background: var(--brs-accent-soft);
+}
+
+.brs-likert-cell {
+  display: block;
+  cursor: pointer;
+}
+
+.brs-likert-cell input {
+  accent-color: var(--brs-accent);
+}
+
+.brs-likert-cards {
+  display: none;
+}
+
+.brs-likert-card {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--brs-line);
+}
+
+.brs-likert-card-label {
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Rating ---------------------------------------------------------------- */
+
+.brs-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: 2.25rem;
+  flex-wrap: wrap;
+}
+
+.brs-rating-label {
+  font-size: 0.85rem;
+  color: var(--brs-muted);
+}
+
+.brs-stars {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.brs-star {
+  padding: 0 0.1rem;
+  border: 0;
+  background: none;
+  color: var(--brs-line);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.brs-star--on {
+  color: var(--brs-accent);
+}
+
+/* Free text ------------------------------------------------------------- */
+
+.brs-question .brs-input {
+  margin-left: 2.25rem;
+  width: calc(100% - 2.25rem);
+}
+
+/* Navigation ------------------------------------------------------------ */
+
+.brs-nav {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.brs-btn {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: var(--brs-radius);
+  background: var(--brs-accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.brs-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.brs-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.brs-btn--ghost {
+  background: none;
+  border: 1px solid var(--brs-line);
+  color: var(--brs-ink);
+}
+
+.brs-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .brs-likert-scroll {
+    display: none;
+  }
+
+  .brs-likert-cards {
+    display: block;
+    margin-left: 0;
+  }
+
+  .brs-hint,
+  .brs-rating {
+    margin-left: 0;
+  }
+
+  .brs-question .brs-input {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .brs-nav .brs-btn {
+    flex: 1;
+  }
+}
+
+.brs-other {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.brs-other-input {
+  margin-left: 1.85rem;
+  width: calc(100% - 1.85rem);
+  max-width: 26rem;
+}
+
+@media (max-width: 720px) {
+  .brs-other-input {
+    margin-left: 0;
+    width: 100%;
+  }
+}

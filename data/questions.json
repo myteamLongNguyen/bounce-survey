@@ -1,0 +1,1106 @@
+{
+  "title": "Operational Resilience in Schools Benchmarking Initiative",
+  "subtitle": "ABSA x Bounce Research Project Australia and New Zealand | 2026",
+  "intro": [
+    {
+      "title": "Purpose of this survey",
+      "body": "ABSA and Bounce have partnered together on this research project to better understand operational resilience preparedness across schools in Australia and New Zealand. This research will establish a baseline understanding of resilience capability across schools and providing evidence-based insights that support improved preparedness, governance, decision-making, and operational continuity. Specifically, the data produced from this initiative will allow us to gain member intelligence and benchmarking. The findings will be used to identify sector trends, benchmark preparedness, and develop practical resources and tools for schools."
+    },
+    {
+      "title": "Who should complete this survey?",
+      "body": "This survey is intended for school leaders and personnel responsible for operational resilience, including principals, deputy principals, business managers, operations managers, risk/compliance personnel, wellbeing leaders, and emergency management or critical incident team members."
+    },
+    {
+      "title": "Time to complete",
+      "body": "Approximately 15-20 minutes."
+    },
+    {
+      "title": "Privacy",
+      "body": "ASBA and Bounce will use the information provided to administer the survey, prepare your school's benchmarking report, provide relevant updates and develop aggregated sector insights. Identifiable results will not be publicly attributed to your school without separate permission. Participation is voluntary, and you should not include personal or sensitive information about students, staff or incident victims."
+    }
+  ],
+  "formNote": "When you submit this form, it will not automatically collect your details like name and email address unless you provide it yourself.",
+  "sections": [
+    {
+      "number": 1,
+      "title": "School Profile",
+      "questions": [
+        {
+          "id": "q1",
+          "number": 1,
+          "type": "single",
+          "text": "Which best describes your school?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Independent",
+            "Catholic"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q2",
+          "number": 2,
+          "type": "single",
+          "text": "What is your role?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Principal / Head of School",
+            "Deputy Principal / Assistant Principal",
+            "Business Manager / School Business Administrator",
+            "Operations / Facilities Manager",
+            "Risk / Compliance Lead",
+            "Wellbeing / Student Services Leader",
+            "Emergency Management / WHS Representative"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q3",
+          "number": 3,
+          "type": "single",
+          "text": "How many students are enrolled at your school?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Fewer than 300",
+            "300–499",
+            "500–999",
+            "1,000–1,999",
+            "2,000 or more"
+          ]
+        },
+        {
+          "id": "q4",
+          "number": 4,
+          "type": "single",
+          "text": "Approximately how many staff work at your school?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Fewer than 20",
+            "20-49",
+            "50-99",
+            "100-199",
+            "200 or more",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q5",
+          "number": 5,
+          "type": "single",
+          "text": "What is your School type?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Day school",
+            "Boarding school",
+            "Combination day school and boarding",
+            "100% Distance Education"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q6",
+          "number": 6,
+          "type": "multiple",
+          "text": "Which year levels does your school serve?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Early Learning / Preschool",
+            "Junior / Primary School",
+            "Secondary / High School",
+            "K–12 / Combined"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q7",
+          "number": 7,
+          "type": "single",
+          "text": "In which country is your school located?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Australia",
+            "New Zealand"
+          ]
+        },
+        {
+          "id": "q8",
+          "number": 8,
+          "type": "single",
+          "text": "Which Australian State or Territory is your school in?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "ACT",
+            "NSW",
+            "NT",
+            "QLD",
+            "SA",
+            "TAS",
+            "VIC",
+            "WA"
+          ],
+          "visibleIf": {
+            "question": "q7",
+            "equals": "Australia"
+          }
+        },
+        {
+          "id": "q9",
+          "number": 9,
+          "type": "single",
+          "text": "Which NZ region is your school in?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Northland",
+            "Auckland",
+            "Waikato",
+            "Bay of Plenty",
+            "Gisborne",
+            "Hawke’s Bay",
+            "Taranaki",
+            "Manawatū-Whanganui",
+            "Wellington",
+            "Tasman",
+            "Nelson",
+            "Marlborough",
+            "West Coast",
+            "Canterbury",
+            "Otago",
+            "Southland"
+          ],
+          "visibleIf": {
+            "question": "q7",
+            "equals": "New Zealand"
+          },
+          "allowOther": true
+        },
+        {
+          "id": "q10",
+          "number": 10,
+          "type": "single",
+          "text": "Where is your school located?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Metropolitan",
+            "Regional",
+            "Rural",
+            "Remote"
+          ]
+        },
+        {
+          "id": "q11",
+          "number": 11,
+          "type": "single",
+          "text": "Which of the following best describes your campus arrangement?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Single campus",
+            "Multiple campuses nearby",
+            "Multiple campuses across different locations"
+          ],
+          "allowOther": true
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Governance and Leadership",
+      "questions": [
+        {
+          "id": "q12",
+          "number": 12,
+          "type": "single",
+          "text": "Who has primary responsibility for operational resilience within your school?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Principal / Head of School",
+            "Leadership / Executive Team",
+            "Business Manager / School Business Administrator",
+            "Risk / Compliance Lead",
+            "Shared responsibility",
+            "Unsure or no one"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q13",
+          "number": 13,
+          "type": "single",
+          "text": "Does your school have a formal committee responsible for emergency preparedness and resilience?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes",
+            "No",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q14",
+          "number": 14,
+          "type": "single",
+          "text": "How often is operational resilience discussed by senior leadership?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Monthly",
+            "Quarterly",
+            "Annually",
+            "Only following incidents",
+            "Never"
+          ]
+        },
+        {
+          "id": "q15",
+          "number": 15,
+          "type": "single",
+          "text": "How often does the Board / Council receive resilience-related reporting?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Monthly",
+            "Quarterly",
+            "Annually",
+            "Ad hoc",
+            "Never"
+          ]
+        },
+        {
+          "id": "q16",
+          "number": 16,
+          "type": "likert",
+          "text": "Rate your level of agreement with the following statements:",
+          "subtext": "",
+          "required": true,
+          "columns": [
+            "Strongly Disagree",
+            "Disagree",
+            "Neutral",
+            "Agree",
+            "Strongly Agree"
+          ],
+          "rows": [
+            "Leadership actively supports preparedness initiatives",
+            "Resilience is integrated into strategic planning",
+            "Roles and responsibilities are clearly defined"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Emergency Management Preparedness",
+      "questions": [
+        {
+          "id": "q17",
+          "number": 17,
+          "type": "single",
+          "text": "How often are your emergency management arrangements formally reviewed?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "More than once per annum",
+            "Annually",
+            "Every 2 years",
+            "Less often than every 2 years",
+            "Only after an incident",
+            "Not reviewed formally",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q18",
+          "number": 18,
+          "type": "multiple",
+          "text": "Which emergency plans do you currently maintain?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Emergency Response Plan / Emergency Management Plan",
+            "Lockdown Procedures",
+            "Evacuation Procedures",
+            "Shelter-in-Place Procedures",
+            "Medical Emergency Procedures",
+            "None of the above"
+          ]
+        },
+        {
+          "id": "q19",
+          "number": 19,
+          "type": "single",
+          "text": "How confident are you that staff understand their role during an emergency?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Not confident",
+            "Slightly confident",
+            "Moderately confident",
+            "Very confident",
+            "Extremely confident."
+          ]
+        },
+        {
+          "id": "q20",
+          "number": 20,
+          "type": "likert",
+          "text": "How frequently are emergency training and exercises conducted at your K-12 campus (excluding ELC)?",
+          "subtext": "",
+          "required": true,
+          "columns": [
+            "Never / greater than 2 years ago",
+            "Every two years",
+            "Annual",
+            "Twice Yearly",
+            "Quarterly"
+          ],
+          "rows": [
+            "Warden training",
+            "Chief Warden / Assembly Area Wardens / Warden Coordinators",
+            "All staff",
+            "Extracurricular staff",
+            "Call takers / reception",
+            "Contractors",
+            "Evacuation drill",
+            "Lockdown drill",
+            "Shelter-in-place drill",
+            "Evacuation to the alternate assembly area",
+            "Lockdown or evacuation during recess or lunch time",
+            "Lockdown or evacuation before or after school",
+            "Lockdown or evacuation during Saturday sports",
+            "Drill incorporating a casualty",
+            "Drill incorporating refusals / missing persons"
+          ]
+        },
+        {
+          "id": "q21",
+          "number": 21,
+          "type": "single",
+          "text": "After drills or exercises, are findings documented and used to improve arrangements?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes, consistently",
+            "Sometimes",
+            "Rarely",
+            "Never",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q22",
+          "number": 22,
+          "type": "single",
+          "text": "Are your school evacuation diagrams are up to date (either updated within the last 5 years or after site changes)?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes, all current",
+            "Some are current",
+            "No",
+            "Unsure"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Critical Incident Management Capability",
+      "questions": [
+        {
+          "id": "q23",
+          "number": 23,
+          "type": "single",
+          "text": "Does your school have a Critical Incident (Crisis) Management Plan or equivalent?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes, current",
+            "Yes, but needs updating",
+            "No",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q24",
+          "number": 24,
+          "type": "single",
+          "text": "Does your school have a designated Critical Incident (Crisis) Management Team?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes",
+            "No",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q25",
+          "number": 25,
+          "type": "single",
+          "text": "How often does your Critical Incident Management Team undertake training in managing an incident?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Quarterly",
+            "Six monthly",
+            "Annually",
+            "Every two years",
+            "We have conducted training over two years ago",
+            "Not completed",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q26",
+          "number": 26,
+          "type": "single",
+          "text": "How often does your Critical Incident Management Team undertake desktop exercising?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Quarterly",
+            "Six monthly",
+            "Annually",
+            "Every two years",
+            "We have conducted training over two years ago",
+            "Not completed",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q27",
+          "number": 27,
+          "type": "likert",
+          "text": "How prepared is your school to manage the following scenarios?",
+          "subtext": "",
+          "required": true,
+          "columns": [
+            "Not Prepared",
+            "Slightly",
+            "Moderately",
+            "Well Prepared",
+            "Highly Prepared"
+          ],
+          "rows": [
+            "Student fatality",
+            "Serious injury incident",
+            "Child protection allegation",
+            "Serious behavioural event",
+            "Reputational crisis",
+            "Media scrutiny",
+            "Cyber attack",
+            "Off campus incident",
+            "Bushfire"
+          ]
+        },
+        {
+          "id": "q28",
+          "number": 28,
+          "type": "multiple",
+          "text": "During an incident, what systems are available to support decision-making?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Incident logs",
+            "Crisis management software (please list below the system/s you use",
+            "Microsoft Teams",
+            "SharePoint",
+            "Whiteboards/manual systems",
+            "Emergency notification platform",
+            "None"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q29",
+          "number": 29,
+          "type": "multiple",
+          "text": "What does your Critical Incident Management Plan contain?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Incident assessment and escalation protocols",
+            "Defined incident leadership roles",
+            "Stakeholder communications process",
+            "Pre-scripted communication templates",
+            "Media / reputational response considerations",
+            "Parent / Guardian reunification arrangements",
+            "Staging area establishment such as counselling centre, media staging",
+            "Meeting agenda templates",
+            "Information management protocols",
+            "SITREP / briefing template",
+            "Recovery planning",
+            "None of the above",
+            "Unsure"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Business Continuity and Recovery",
+      "questions": [
+        {
+          "id": "q30",
+          "number": 30,
+          "type": "single",
+          "text": "Does your school have a documented Business Continuity Plan, continuity framework, or equivalent?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes, current",
+            "Yes, but needs updating",
+            "No",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q31",
+          "number": 31,
+          "type": "single",
+          "text": "Has your school completed a Business Impact Analysis (break down of processes per business area identifying critical business functions, IT needed, equipment needed, people resources needed)?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Completed and updated annually",
+            "Completed but not updated in the last 2 years",
+            "Started but not finished",
+            "No",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q32",
+          "number": 32,
+          "type": "likert",
+          "text": "How prepared is your school to continue or recover essential operations following disruption to any of the following?",
+          "subtext": "",
+          "required": true,
+          "columns": [
+            "n/a",
+            "Not Prepared",
+            "Slightly",
+            "Moderately",
+            "Well Prepared",
+            "Highly Prepared"
+          ],
+          "rows": [
+            "Boarding facility loss",
+            "Building or learning space loss",
+            "Cyber attack",
+            "Loss of key supplier",
+            "Major ICT outage",
+            "Staff shortages",
+            "Utility failure"
+          ]
+        },
+        {
+          "id": "q33",
+          "number": 33,
+          "type": "single",
+          "text": "Has your school tested its business continuity or recovery arrangements in the past 24 months?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Tested annually",
+            "Tested between 1 and 2 years ago",
+            "Tested over 3 years ago",
+            "No",
+            "Unsure"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Communications Readiness",
+      "questions": [
+        {
+          "id": "q34",
+          "number": 34,
+          "type": "multiple",
+          "text": "Which communication channels does your school rely on during emergencies or critical incidents?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Email",
+            "Emergency hotline",
+            "PA / alarm / EWIS",
+            "Phone tree / phone calls",
+            "School app / parent communication platform",
+            "SMS / mass notification platform",
+            "Social media",
+            "Teams / internal collaboration platform",
+            "Two-way radios",
+            "Website notifications / updates",
+            "WhatsApp"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q35",
+          "number": 35,
+          "type": "rating",
+          "text": "How confident are you in your school’s ability to communicate within 30 minutes with families during an incident?",
+          "subtext": "",
+          "required": true,
+          "stars": 5,
+          "lowLabel": "Not confident at all",
+          "highLabel": "Very confident"
+        },
+        {
+          "id": "q36",
+          "number": 36,
+          "type": "single",
+          "text": "Does your school have pre-prepared templates or protocols for communicating with families during incidents?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes",
+            "Partly",
+            "No",
+            "Unsure"
+          ]
+        },
+        {
+          "id": "q37",
+          "number": 37,
+          "type": "multiple",
+          "text": "What communication challenges have you experienced?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Delayed approvals",
+            "Mixed messaging",
+            "Out-of-date contact information",
+            "Parent misinformation",
+            "Phone / internet reception",
+            "Social media issues",
+            "Staff uncertainty",
+            "System failures"
+          ],
+          "allowOther": true
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Incident Experience",
+      "questions": [
+        {
+          "id": "q38",
+          "number": 38,
+          "type": "likert",
+          "text": "What types of incidents has your school experienced in the past 2 years, and how effective was the school's response?",
+          "subtext": "",
+          "required": true,
+          "columns": [
+            "Not effective at all",
+            "Slightly effective",
+            "Moderately effective",
+            "Mostly effective",
+            "Very effective",
+            "Not applicable"
+          ],
+          "rows": [
+            "Bushfire",
+            "Child Safety",
+            "Cyber incident",
+            "Data breach",
+            "Extended power outage",
+            "Fire / smoke incident",
+            "Flooding",
+            "ICT outage",
+            "Infectious disease / public health disruption",
+            "Infrastructure failure or damage",
+            "Intruder / personal threat",
+            "Medical emergency",
+            "Reputational / major media issue",
+            "Severe weather",
+            "Staff shortage crisis",
+            "Student behaviour / violence incident",
+            "Utilities failure"
+          ]
+        },
+        {
+          "id": "q39",
+          "number": 39,
+          "type": "textarea",
+          "text": "If Other, please specify the incident type experienced.",
+          "subtext": "",
+          "required": false
+        },
+        {
+          "id": "q40",
+          "number": 40,
+          "type": "single",
+          "text": "How long was normal school operation disrupted?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "No disruption",
+            "Less than one day",
+            "1–3 days",
+            "4–7 days",
+            "More than one week"
+          ]
+        },
+        {
+          "id": "q41",
+          "number": 41,
+          "type": "textarea",
+          "text": "What was the most important lesson learned?",
+          "subtext": "",
+          "required": true
+        },
+        {
+          "id": "q42",
+          "number": 42,
+          "type": "multiple",
+          "text": "Which incident had the greatest impact?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Bushfire",
+            "Child Safety",
+            "Cyber incident",
+            "Data breach",
+            "Extended power outage",
+            "Fire / smoke incident",
+            "Flooding",
+            "ICT outage",
+            "Infectious disease / public health disruption",
+            "Infrastructure failure or damage",
+            "Intruder / personal threat",
+            "Medical emergency",
+            "Reputational / major media issue",
+            "Severe weather",
+            "Staff shortage crisis",
+            "Student behaviour / violence incident",
+            "Utilities failure"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q43",
+          "number": 43,
+          "type": "multiple",
+          "text": "What were the most common challenges experienced during incidents?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Communication delays",
+            "Decision-making delays",
+            "ICT limitations",
+            "Inadequate plans",
+            "Lack of situational awareness",
+            "Lack of training",
+            "Leadership team availability",
+            "Parent / community pressure",
+            "Recovery took longer than expected",
+            "Role confusion",
+            "Staff availability",
+            "Not applicable"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q44",
+          "number": 44,
+          "type": "single",
+          "text": "Did your school seek external support in the management of the critical incident / crisis?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes",
+            "No",
+            "Not Applicable"
+          ]
+        },
+        {
+          "id": "q45",
+          "number": 45,
+          "type": "textarea",
+          "text": "What external support did you seek?",
+          "subtext": "",
+          "required": true,
+          "visibleIf": {
+            "question": "q44",
+            "equals": "Yes"
+          }
+        },
+        {
+          "id": "q46",
+          "number": 46,
+          "type": "textarea",
+          "text": "How was this support beneficial in the recovery phase and post incident review?",
+          "subtext": "",
+          "required": true,
+          "visibleIf": {
+            "question": "q44",
+            "equals": "Yes"
+          }
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Self-Assessment of Maturity",
+      "questions": [
+        {
+          "id": "q47",
+          "number": 47,
+          "type": "multiple",
+          "text": "What are the greatest barriers to improving operational resilience at your school?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Competing priorities",
+            "Complexity of school operations",
+            "Difficulty maintaining plans over time",
+            "Lack of internal expertise",
+            "Limited budget",
+            "Limited executive support",
+            "Limited time",
+            "Low engagement from staff",
+            "Staff turnover"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q48",
+          "number": 48,
+          "type": "multiple",
+          "text": "What has most improved resilience at your school in recent years?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Better communication tools",
+            "Better plans",
+            "Better technology / systems",
+            "External support / consultants",
+            "Incident experience / lessons learned",
+            "More drills / exercises",
+            "More training",
+            "Stronger leadership support"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "q49",
+          "number": 49,
+          "type": "likert",
+          "text": "Overall, how would you rate your school’s maturity in the following areas?",
+          "subtext": "",
+          "required": true,
+          "columns": [
+            "Reactive",
+            "Basic Compliance",
+            "Practised",
+            "Integrated",
+            "Leading Practice"
+          ],
+          "rows": [
+            "Business Continuity",
+            "Communications during incidents",
+            "Critical Incident Management",
+            "Emergency Management",
+            "Governance",
+            "Staff confidence and readiness"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Emerging Risks",
+      "questions": [
+        {
+          "id": "q50",
+          "number": 50,
+          "type": "multiple",
+          "text": "Which risks are of greatest concern over the next five years?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "AI-related risks",
+            "Child safety obligations",
+            "Climate events",
+            "Cyber threats",
+            "Financial pressures",
+            "Infrastructure failure",
+            "Regulatory compliance",
+            "Reputation and social media",
+            "Staff wellbeing",
+            "Student wellbeing",
+            "Workforce shortages"
+          ],
+          "maxSelect": 5
+        },
+        {
+          "id": "q51",
+          "number": 51,
+          "type": "multiple",
+          "text": "Which areas should be the highest priority for improvement over the next 12–24 months?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Business continuity",
+            "CIMT capability",
+            "Communications systems",
+            "Critical Incident / Crisis management capability",
+            "Cybersecurity",
+            "Data / benchmarking",
+            "Emergency planning",
+            "Exercises and drills",
+            "External specialist support",
+            "Governance / accountability",
+            "Staff training",
+            "Technology resilience"
+          ],
+          "maxSelect": 5,
+          "allowOther": true
+        },
+        {
+          "id": "q52",
+          "number": 52,
+          "type": "multiple",
+          "text": "What resources or support would be most valuable to your school?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Benchmarking tool / scorecard",
+            "Business continuity support",
+            "Communications resources",
+            "Critical incident management coaching",
+            "Emergency management planning support",
+            "Exercise design and facilitation",
+            "Practical templates",
+            "Survey findings / final report",
+            "Training programs"
+          ],
+          "allowOther": true
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Open Response",
+      "questions": [
+        {
+          "id": "q53",
+          "number": 53,
+          "type": "textarea",
+          "text": "In your view, what is the biggest operational resilience challenge currently facing schools?",
+          "subtext": "",
+          "required": true
+        },
+        {
+          "id": "q54",
+          "number": 54,
+          "type": "textarea",
+          "text": "What is one practical change that would most improve preparedness at your school?",
+          "subtext": "",
+          "required": true
+        },
+        {
+          "id": "q55",
+          "number": 55,
+          "type": "textarea",
+          "text": "Is there anything else you would like to share about your school’s experience with emergency management, critical incident management, or business continuity?",
+          "subtext": "",
+          "required": true
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "title": "Follow-up Participation",
+      "questions": [
+        {
+          "id": "q56",
+          "number": 56,
+          "type": "multiple",
+          "text": "Would you be willing to participate in a follow-up interview or workshop, and receive a report with recommendations and regular updates from this research project?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Follow-up Interview",
+            "Workshop",
+            "Receive a report with recommendations",
+            "Regular updates and findings from this research project",
+            "None of the above"
+          ]
+        },
+        {
+          "id": "q57",
+          "number": 57,
+          "type": "text",
+          "text": "Email address",
+          "subtext": "",
+          "required": true,
+          "visibleIf": {
+            "question": "q56",
+            "notIn": [ "None of the above" ]
+          }
+        },
+        {
+          "id": "q59",
+          "number": 58,
+          "type": "text",
+          "text": "School name",
+          "subtext": "",
+          "required": false
+        },
+        {
+          "id": "q60",
+          "number": 59,
+          "type": "text",
+          "text": "Full name",
+          "subtext": "",
+          "required": true,
+          "visibleIf": {
+            "question": "q56",
+            "notIn": [ "None of the above" ]
+          }
+        },
+        {
+          "id": "q61",
+          "number": 60,
+          "type": "text",
+          "text": "Phone number",
+          "subtext": "",
+          "required": true,
+          "visibleIf": {
+            "question": "q56",
+            "notIn": [ "None of the above" ]
+          }
+        },
+        {
+          "id": "q58",
+          "number": 61,
+          "type": "single",
+          "text": "May we quote your insights in the report or related publications?",
+          "subtext": "",
+          "required": true,
+          "options": [
+            "Yes, with school name",
+            "Yes, but de-identified",
+            "No"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(php -v)",
+      "Bash(unzip -l \"c:/Users/Long.Nguyen/Downloads/bounce-resilience-survey/bounce-resilience-survey.zip\")",
+      "Bash(rm -rf /tmp/brs-verify2)",
+      "Bash(mkdir -p /tmp/brs-verify2)",
+      "Bash(unzip -q \"c:/Users/Long.Nguyen/Downloads/bounce-resilience-survey/bounce-resilience-survey.zip\")"
+    ]
+  }
+}
