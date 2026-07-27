@@ -671,7 +671,10 @@ class BRS_Admin {
 			'tenant_id'     => isset( $_POST['tenant_id'] ) ? sanitize_text_field( wp_unslash( $_POST['tenant_id'] ) ) : '',
 			'client_id'     => isset( $_POST['client_id'] ) ? sanitize_text_field( wp_unslash( $_POST['client_id'] ) ) : '',
 			'client_secret' => ! empty( $_POST['client_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['client_secret'] ) ) : $existing['client_secret'],
-			'folder_link'   => isset( $_POST['folder_link'] ) ? sanitize_text_field( wp_unslash( $_POST['folder_link'] ) ) : '',
+			// esc_url_raw, not sanitize_text_field - the latter strips any
+			// %XX octet (meant to catch %0d%0a header injection) which also
+			// destroys legitimate URL-encoding like the %20s in folder names.
+			'folder_link'   => isset( $_POST['folder_link'] ) ? esc_url_raw( wp_unslash( $_POST['folder_link'] ) ) : '',
 		);
 
 		// Not autoloaded - this option (and the token option) hold a secret,
