@@ -1050,7 +1050,7 @@
           "type": "text",
           "text": "Email address",
           "subtext": "",
-          "required": false,
+          "required": true,
           "visibleIf": {
             "question": "q56",
             "notIn": [ "None of the above" ]
@@ -1070,7 +1070,7 @@
           "type": "text",
           "text": "Full name",
           "subtext": "",
-          "required": false,
+          "required": true,
           "visibleIf": {
             "question": "q56",
             "notIn": [ "None of the above" ]
@@ -1082,7 +1082,7 @@
           "type": "text",
           "text": "Phone number",
           "subtext": "",
-          "required": false,
+          "required": true,
           "visibleIf": {
             "question": "q56",
             "notIn": [ "None of the above" ]
