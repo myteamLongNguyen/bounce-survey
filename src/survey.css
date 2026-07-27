@@ -166,6 +166,16 @@
   color: var(--brs-muted);
 }
 
+.brs-disclosure {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--brs-line);
+  border-radius: var(--brs-radius);
+  background: var(--brs-accent-soft);
+  font-size: 0.85rem;
+  color: var(--brs-muted);
+}
+
 .brs-progress {
   margin: 0 0 1.5rem;
   font-size: 0.8rem;

@@ -1,4 +1,5 @@
 export const OTHER = 'Other';
+export const NONE_OF_THE_ABOVE = 'None of the above';
 
 /**
  * Renders one question. Five types appear in this form:
@@ -6,7 +7,9 @@ export const OTHER = 'Other';
  */
 export default function Question({ question: q, value, otherText, onOtherChange, onChange, missing }) {
   return (
-    <fieldset className={`brs-question${missing ? ' brs-question--missing' : ''}`}>
+    <>
+      {q.note && <p className="brs-disclosure">{q.note}</p>}
+      <fieldset className={`brs-question${missing ? ' brs-question--missing' : ''}`}>
       <legend className="brs-legend">
         <span className="brs-number">{q.number}</span>
         <span className="brs-question-text">
@@ -42,7 +45,8 @@ export default function Question({ question: q, value, otherText, onOtherChange,
       )}
 
       {missing && <p className="brs-inline-error">Please answer this question.</p>}
-    </fieldset>
+      </fieldset>
+    </>
   );
 }
 
@@ -77,14 +81,22 @@ function SingleChoice({ q, value, onChange, otherText, onOtherChange }) {
 
 function MultipleChoice({ q, value, onChange, otherText, onOtherChange }) {
   const picked = Array.isArray(value) ? value : [];
-  const atLimit = q.maxSelect && picked.length >= q.maxSelect;
+  const nonNonePicked = picked.filter((p) => p !== NONE_OF_THE_ABOVE);
+  const atLimit = q.maxSelect && nonNonePicked.length >= q.maxSelect;
 
+  // "None of the above" is exclusive: picking it clears every other
+  // selection, and picking anything else clears it.
   function toggle(opt) {
     if (picked.includes(opt)) {
       onChange(picked.filter((p) => p !== opt));
-    } else if (!atLimit) {
-      onChange([...picked, opt]);
+      return;
     }
+    if (opt === NONE_OF_THE_ABOVE) {
+      onChange([NONE_OF_THE_ABOVE]);
+      return;
+    }
+    if (atLimit) return;
+    onChange([...nonNonePicked, opt]);
   }
 
   return (
@@ -97,15 +109,16 @@ function MultipleChoice({ q, value, onChange, otherText, onOtherChange }) {
       <div className="brs-options">
         {q.options.map((opt) => {
           const on = picked.includes(opt);
+          const disabled = opt !== NONE_OF_THE_ABOVE && !on && atLimit;
           return (
             <label
               key={opt}
-              className={`brs-option${!on && atLimit ? ' brs-option--disabled' : ''}`}
+              className={`brs-option${disabled ? ' brs-option--disabled' : ''}`}
             >
               <input
                 type="checkbox"
                 checked={on}
-                disabled={!on && atLimit}
+                disabled={disabled}
                 onChange={() => toggle(opt)}
               />
               <span>{opt}</span>
