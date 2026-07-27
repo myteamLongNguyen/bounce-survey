@@ -48,6 +48,10 @@ class BRS_Admin {
 			<h1 class="wp-heading-inline">Submissions</h1>
 			<a href="<?php echo esc_url( $export_url ); ?>" class="page-title-action">Download CSV</a>
 
+			<?php if ( isset( $_GET['brs_deleted'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>Submission deleted.</p></div>
+			<?php endif; ?>
+
 			<p><?php echo esc_html( number_format_i18n( $total ) ); ?> submission(s) recorded.</p>
 
 			<table class="widefat striped">
@@ -60,17 +64,22 @@ class BRS_Admin {
 						<th>Role</th>
 						<th>Country</th>
 						<th>Email</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php if ( empty( $rows ) ) : ?>
-						<tr><td colspan="7">No submissions yet. Once the survey page is live, responses will appear here.</td></tr>
+						<tr><td colspan="8">No submissions yet. Once the survey page is live, responses will appear here.</td></tr>
 					<?php endif; ?>
 
 					<?php
 					foreach ( $rows as $row ) :
-						$a   = json_decode( $row->answers, true );
-						$url = add_query_arg( array( 'page' => 'brs-submissions', 'ref' => $row->reference ), admin_url( 'admin.php' ) );
+						$a          = json_decode( $row->answers, true );
+						$url        = add_query_arg( array( 'page' => 'brs-submissions', 'ref' => $row->reference ), admin_url( 'admin.php' ) );
+						$delete_url = wp_nonce_url(
+							admin_url( 'admin-post.php?action=brs_delete_submission&ref=' . rawurlencode( $row->reference ) ),
+							'brs_delete_submission_' . $row->reference
+						);
 						?>
 						<tr>
 							<td><a href="<?php echo esc_url( $url ); ?>"><code><?php echo esc_html( $row->reference ); ?></code></a></td>
@@ -80,6 +89,13 @@ class BRS_Admin {
 							<td><?php echo esc_html( isset( $a['q2'] ) ? $a['q2'] : '-' ); ?></td>
 							<td><?php echo esc_html( isset( $a['q7'] ) ? $a['q7'] : '-' ); ?></td>
 							<td><?php echo esc_html( $row->email ? $row->email : '-' ); ?></td>
+							<td>
+								<a
+									href="<?php echo esc_url( $delete_url ); ?>"
+									class="brs-delete-link"
+									onclick="return confirm('Delete submission <?php echo esc_js( $row->reference ); ?>? This cannot be undone.');"
+								>Delete</a>
+							</td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
@@ -116,10 +132,19 @@ class BRS_Admin {
 			return;
 		}
 
-		$a = json_decode( $row->answers, true );
+		$a          = json_decode( $row->answers, true );
+		$delete_url = wp_nonce_url(
+			admin_url( 'admin-post.php?action=brs_delete_submission&ref=' . rawurlencode( $row->reference ) ),
+			'brs_delete_submission_' . $row->reference
+		);
 		?>
 		<div class="wrap">
-			<h1>Submission <code><?php echo esc_html( $row->reference ); ?></code></h1>
+			<h1 class="wp-heading-inline">Submission <code><?php echo esc_html( $row->reference ); ?></code></h1>
+			<a
+				href="<?php echo esc_url( $delete_url ); ?>"
+				class="page-title-action"
+				onclick="return confirm('Delete submission <?php echo esc_js( $row->reference ); ?>? This cannot be undone.');"
+			>Delete</a>
 			<p>
 				<a href="<?php echo esc_url( $back ); ?>">&larr; Back to submissions</a> &middot;
 				Submitted <?php echo esc_html( $row->created_at ); ?>
@@ -470,6 +495,32 @@ class BRS_Admin {
 		header( 'Content-Disposition: attachment; filename=bounce-survey-' . gmdate( 'Y-m-d-His' ) . '.csv' );
 
 		echo self::build_csv_string();
+		exit;
+	}
+
+	/**
+	 * Deletes one submission and, if OneDrive is connected, schedules the
+	 * same re-push used for new submissions so the exported CSV drops the
+	 * row right away rather than waiting on the next response.
+	 */
+	public static function handle_delete_submission() {
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_die( 'You do not have permission to do that.' );
+		}
+
+		$reference = isset( $_GET['ref'] ) ? sanitize_text_field( wp_unslash( $_GET['ref'] ) ) : '';
+
+		check_admin_referer( 'brs_delete_submission_' . $reference );
+
+		if ( $reference ) {
+			$deleted = BRS_DB::delete_by_reference( $reference );
+
+			if ( $deleted && BRS_OneDrive::is_connected() ) {
+				wp_schedule_single_event( time(), 'brs_push_onedrive' );
+			}
+		}
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'brs-submissions', 'brs_deleted' => '1' ), admin_url( 'admin.php' ) ) );
 		exit;
 	}
 

@@ -152,4 +152,15 @@ class BRS_DB {
 			$wpdb->prepare( 'SELECT * FROM ' . self::table() . ' WHERE reference = %s', $reference )
 		);
 	}
+
+	/**
+	 * @return bool True if a row was deleted.
+	 */
+	public static function delete_by_reference( $reference ) {
+		global $wpdb;
+
+		$deleted = $wpdb->delete( self::table(), array( 'reference' => $reference ), array( '%s' ) );
+
+		return (bool) $deleted;
+	}
 }
