@@ -186,6 +186,47 @@ class BRS_OneDrive {
 	}
 
 	/**
+	 * Which Microsoft account is actually behind "Connected" - shown on the
+	 * settings screen so a mismatch (connected as the wrong identity, or an
+	 * identity that doesn't have edit access to the destination folder) is
+	 * obvious at a glance instead of only surfacing later as a cryptic
+	 * "access denied" on test push.
+	 *
+	 * @return string|WP_Error
+	 */
+	public static function connected_account() {
+		$token = self::get_access_token();
+
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		$response = wp_remote_get(
+			'https://graph.microsoft.com/v1.0/me?$select=displayName,userPrincipalName,mail',
+			array(
+				'timeout' => 15,
+				'headers' => array( 'Authorization' => 'Bearer ' . $token ),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( empty( $body['userPrincipalName'] ) && empty( $body['mail'] ) ) {
+			$message = isset( $body['error']['message'] ) ? $body['error']['message'] : 'Could not read the connected account.';
+			return new WP_Error( 'brs_onedrive_whoami', $message );
+		}
+
+		$email = ! empty( $body['mail'] ) ? $body['mail'] : $body['userPrincipalName'];
+		$name  = ! empty( $body['displayName'] ) ? $body['displayName'] : '';
+
+		return $name ? "$name ($email)" : $email;
+	}
+
+	/**
 	 * Turns any OneDrive/SharePoint web link into the encoded form the
 	 * "shares" API expects. Documented by Microsoft as: base64-encode the
 	 * URL, make it URL-safe, drop the padding, prefix "u!".

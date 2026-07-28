@@ -603,6 +603,17 @@ class BRS_Admin {
 			<h2>2. Connect</h2>
 			<p>Status: <strong><?php echo $connected ? 'Connected' : 'Not connected'; ?></strong></p>
 
+			<?php if ( $connected ) : ?>
+				<?php $whoami = BRS_OneDrive::connected_account(); ?>
+				<p>
+					<?php if ( is_wp_error( $whoami ) ) : ?>
+						<em style="color:#a3320b;">Could not confirm which account is connected: <?php echo esc_html( $whoami->get_error_message() ); ?></em>
+					<?php else : ?>
+						Connected as <strong><?php echo esc_html( $whoami ); ?></strong> - make sure this is the account with edit access to the destination folder.
+					<?php endif; ?>
+				</p>
+			<?php endif; ?>
+
 			<?php if ( BRS_OneDrive::is_configured() ) : ?>
 				<p>
 					<a href="<?php echo esc_url( BRS_OneDrive::authorize_url() ); ?>" class="button button-primary">
