@@ -50,27 +50,29 @@ class BRS_DB {
 		dbDelta( $sql );
 
 		update_option( self::SCHEMA_OPTION, self::SCHEMA_VERSION );
+
+		// Always runs, not just when the schema version actually changed:
+		// register_activation_hook() calls install() directly on every
+		// (re)activation, bypassing maybe_upgrade()'s version check entirely -
+		// so gating this on "did the version just change" is unreliable.
+		// backfill_scores() only touches rows still missing a score, so
+		// calling it on every install()/activation is a cheap no-op once
+		// everything is caught up.
+		self::backfill_scores();
 	}
 
 	public static function maybe_upgrade() {
-		$previous = (int) get_option( self::SCHEMA_OPTION, 0 );
-
-		if ( $previous >= self::SCHEMA_VERSION ) {
-			return;
-		}
-
-		self::install();
-
-		// v3 added scoring - anything submitted before that (total_score still
-		// NULL) never got a score, so it 404s on the results page and is
-		// silently excluded from the peer comparison. Score it now, once,
-		// using the current scoring model - same as any newly-imported row.
-		if ( $previous < 3 ) {
-			self::backfill_scores();
+		if ( (int) get_option( self::SCHEMA_OPTION, 0 ) < self::SCHEMA_VERSION ) {
+			self::install();
 		}
 	}
 
 	/**
+	 * Anything submitted before scoring existed (total_score still NULL)
+	 * never got a score, so it 404s on the results page and is silently
+	 * excluded from the peer comparison. Score it now, using whatever the
+	 * current scoring model is - same treatment a newly-imported row gets.
+	 *
 	 * @return int Number of rows scored.
 	 */
 	private static function backfill_scores() {
