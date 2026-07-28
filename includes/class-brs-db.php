@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class BRS_DB {
 
-	const SCHEMA_VERSION = 1;
+	const SCHEMA_VERSION = 2;
 	const SCHEMA_OPTION  = 'brs_schema_version';
 
 	public static function table() {
@@ -36,7 +36,8 @@ class BRS_DB {
 			external_id varchar(191) DEFAULT NULL,
 			email varchar(191) DEFAULT NULL,
 			answers longtext NOT NULL,
-			total_score int(11) DEFAULT NULL,
+			total_score decimal(6,1) DEFAULT NULL,
+			category_scores longtext DEFAULT NULL,
 			ip_hash char(64) DEFAULT NULL,
 			created_at datetime NOT NULL,
 			PRIMARY KEY  (id),
@@ -81,10 +82,13 @@ class BRS_DB {
 	 * @param string|null $email
 	 * @param string      $source      'web' or 'msforms'
 	 * @param string|null $external_id Microsoft Forms response id, when importing
+	 * @param array|null  $scored      Output of BRS_Scoring::score(), snapshotted at
+	 *                                 submit time so later scoring-model edits never
+	 *                                 retroactively change an already-issued report.
 	 *
 	 * @return string|WP_Error The reference on success.
 	 */
-	public static function insert( array $answers, $email = null, $source = 'web', $external_id = null ) {
+	public static function insert( array $answers, $email = null, $source = 'web', $external_id = null, $scored = null ) {
 		global $wpdb;
 
 		$reference = self::generate_reference();
@@ -92,18 +96,17 @@ class BRS_DB {
 		$result = $wpdb->insert(
 			self::table(),
 			array(
-				'reference'   => $reference,
-				'source'      => $source,
-				'external_id' => $external_id,
-				'email'       => $email ? $email : null,
-				'answers'     => wp_json_encode( $answers ),
-				// total_score stays null in phase 1. Scoring arrives with the
-				// maturity model; the column is here so phase 2 can backfill.
-				'total_score' => null,
-				'ip_hash'     => self::hash_ip(),
-				'created_at'  => current_time( 'mysql' ),
+				'reference'       => $reference,
+				'source'          => $source,
+				'external_id'     => $external_id,
+				'email'           => $email ? $email : null,
+				'answers'         => wp_json_encode( $answers ),
+				'total_score'     => $scored ? $scored['total'] : null,
+				'category_scores' => $scored ? wp_json_encode( $scored ) : null,
+				'ip_hash'         => self::hash_ip(),
+				'created_at'      => current_time( 'mysql' ),
 			),
-			array( '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+			array( '%s', '%s', '%s', '%s', '%s', '%f', '%s', '%s', '%s' )
 		);
 
 		if ( false === $result ) {
@@ -143,6 +146,33 @@ class BRS_DB {
 	public static function get_all() {
 		global $wpdb;
 		return $wpdb->get_results( 'SELECT * FROM ' . self::table() . ' ORDER BY created_at ASC' );
+	}
+
+	/**
+	 * All scored submissions' total/section scores, for the peer comparison
+	 * on the results dashboard. Unscored rows (total_score IS NULL - imported
+	 * MS Forms rows before scoring existed, or rows that predate this feature)
+	 * are excluded so they don't drag the peer average down artificially.
+	 */
+	public static function get_scored_totals() {
+		global $wpdb;
+
+		$rows = $wpdb->get_results(
+			'SELECT reference, total_score, category_scores FROM ' . self::table() . ' WHERE total_score IS NOT NULL'
+		);
+
+		return array_map(
+			function ( $row ) {
+				$scored = json_decode( $row->category_scores, true );
+
+				return array(
+					'reference' => $row->reference,
+					'total'     => (float) $row->total_score,
+					'sections'  => is_array( $scored ) && isset( $scored['sections'] ) ? $scored['sections'] : array(),
+				);
+			},
+			$rows
+		);
 	}
 
 	public static function get_by_reference( $reference ) {

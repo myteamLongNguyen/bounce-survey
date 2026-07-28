@@ -1,0 +1,277 @@
+{
+  "denominator": 392.5,
+  "maturityLevels": [
+    { "level": 1, "key": "reactive", "label": "Reactive", "fullLabel": "Level 1 – Reactive (minimal planning, ad hoc response)", "minInclusive": 0, "maxExclusive": 105 },
+    { "level": 2, "key": "compliant", "label": "Basic Compliance", "fullLabel": "Level 2 – Compliant (plans exist, limited testing)", "minInclusive": 105, "maxExclusive": 285 },
+    { "level": 3, "key": "practised", "label": "Practised", "fullLabel": "Level 3 – Practised (regular drills, defined roles)", "minInclusive": 285, "maxExclusive": 332.5 },
+    { "level": 4, "key": "integrated", "label": "Integrated", "fullLabel": "Level 4 – Integrated (aligned EM, CIM, BC systems)", "minInclusive": 332.5, "maxExclusive": 364 },
+    { "level": 5, "key": "leading", "label": "Leading Practice", "fullLabel": "Level 5 – Leading (continuous improvement, data-driven)", "minInclusive": 364, "maxInclusive": 392.5 }
+  ],
+  "sections": {
+    "Governance and Leadership": { "anchors": { "L1": 15, "L2": 55, "L3": 67.5, "L4": 75.5, "L5": 85 } },
+    "Emergency Management Preparedness": { "anchors": { "L1": 32.5, "L2": 87.5, "L3": 95, "L4": 105, "L5": 110 } },
+    "Critical Incident Management Capability": { "anchors": { "L1": 32.5, "L2": 87.5, "L3": 102.5, "L4": 110, "L5": 117.5 } },
+    "Business Continuity and Recovery": { "anchors": { "L1": 17.5, "L2": 40, "L3": 50, "L4": 55, "L5": 60 } },
+    "Communications Readiness": { "anchors": { "L1": 7.5, "L2": 15, "L3": 17.5, "L4": 18.5, "L5": 20 } }
+  },
+  "questions": {
+    "q12": {
+      "section": "Governance and Leadership", "kind": "single", "max": 10,
+      "ratings": [10, 10, 10, 10, 2.5, 0],
+      "feedback": [
+        "Document resilience ownership in the Principal / Head of School's role description and the school's resilience policy. Consider delegating day-to-day coordination to a nominated deputy while retaining executive accountability, and establish clear reporting lines to the Board / Council.",
+        "Clarify which individual within the Leadership / Executive Team holds primary accountability for resilience to avoid diffusion of responsibility. Document this ownership in role descriptions and the resilience policy, and ensure regular reporting to the Board / Council on resilience activities and outcomes.",
+        "Formally document the Business Manager / School Business Administrator's responsibility for resilience, ensure it is supported by the Principal, and establish clear escalation pathways. Regular reporting to the Leadership Team and Board / Council will strengthen governance oversight.",
+        "Ensure the Risk / Compliance Lead has sufficient authority and access to leadership to drive preparedness initiatives effectively. Document the responsibility formally, establish clear reporting lines to the Executive and Board / Council, and ensure adequate time allocation for resilience activities alongside other compliance duties.",
+        "Assign primary accountability for resilience to a single individual (such as the Principal, Business Manager, or Risk Lead) while maintaining shared involvement across the leadership team. Document this ownership in role descriptions and the school's resilience policy to ensure clarity and accountability.",
+        "Assign primary responsibility for resilience to an appropriate senior leader (such as the Principal, Business Manager, or Risk Lead) and document this in their role description and the school's resilience policy. Communicate this ownership to staff and establish reporting lines to ensure accountability."
+      ],
+      "otherRating": 2.5,
+      "otherFeedback": "Ensure whoever holds primary responsibility for operational resilience has appropriate seniority, authority, and access to leadership. Document the responsibility formally in role descriptions and the school's resilience policy. Establish clear reporting lines to the Executive and Board / Council, and ensure the role is resourced with adequate time and support."
+    },
+    "q13": {
+      "section": "Governance and Leadership", "kind": "single", "max": 10,
+      "ratings": [10, 0, 0],
+      "feedback": [
+        "Ensure the Emergency Planning Committee meets regularly (at least quarterly), maintains documented terms of reference, and includes representatives from key operational areas. Review committee membership annually and track actions to completion.",
+        "Establish an Emergency Planning Committee with at least two members, including the Chief Warden, Facilities Manager, and representatives from key areas such as boarding, sports, and student services. This committee can be integrated with existing forums such as your WHS/OHS Committee or Leadership Team. Define terms of reference, meeting frequency, and reporting lines.",
+        "Clarify whether a formal committee exists with responsibility for emergency preparedness and resilience. If one exists, ensure its role, membership, and meeting schedule are clearly documented and communicated. If not, establish an Emergency Planning Committee with at least two members and define terms of reference."
+      ]
+    },
+    "q14": {
+      "section": "Governance and Leadership", "kind": "single", "max": 20,
+      "ratings": [20, 15, 10, 5, 0],
+      "feedback": [
+        "Include review of key risk indicators, incident trends, exercise outcomes, and progress on improvement actions in leadership resilience discussions. Consider incorporating mini desktop scenarios quarterly to test decision-making capabilities.",
+        "Increase leadership resilience discussions to monthly to enable more responsive decision-making, particularly during periods of elevated risk. Ensure each session covers key risks, recent incidents or near-misses, exercise outcomes, and accountability for improvement actions.",
+        "Increase leadership resilience discussions to at least quarterly, establishing operational resilience as a standing agenda item. Include updates on risk trends, incident learnings, exercise outcomes, and progress on improvement initiatives.",
+        "Establish a regular cadence (start with six-monthly, progressing to quarterly) for proactive resilience discussions. This shift from reactive to planned engagement enables leadership to identify emerging risks, allocate resources effectively, and drive continuous improvement.",
+        "Establish operational resilience as a standing agenda item for leadership meetings, starting with six-monthly then progressing to quarterly. Include updates on emergency preparedness, business continuity, incident trends, and improvement actions. Document decisions and assign accountability."
+      ]
+    },
+    "q15": {
+      "section": "Governance and Leadership", "kind": "single", "max": 15,
+      "ratings": [15, 12.5, 10, 7.5, 0],
+      "feedback": [
+        "Ensure Board / Council resilience reports include key risk indicators, incident summaries, exercise outcomes, and progress on improvement actions. Periodically review the report format to maintain engagement and relevance.",
+        "Consider increasing Board / Council reporting to monthly to enable more timely governance decisions, particularly during periods of heightened risk or following significant incidents. Ensure reports capture key risk trends, incident outcomes, and progress on resilience initiatives.",
+        "Increase Board / Council reporting to at least quarterly, including updates on key risks, incident trends, exercise outcomes, and improvement actions. Regular reporting strengthens governance and demonstrates commitment to operational resilience.",
+        "Establish a regular reporting schedule (at least quarterly) for Board / Council updates on resilience activities, risks, and improvement initiatives. Structured reporting ensures the Board remains informed and can fulfil governance responsibilities effectively.",
+        "Establish a formal reporting mechanism to provide at least annual (preferably quarterly) Board / Council updates on operational resilience, including emergency preparedness, business continuity, and critical incident management."
+      ]
+    },
+    "q16": {
+      "section": "Governance and Leadership", "kind": "likert_rows",
+      "rows": [
+        {
+          "row": 0, "label": "Leadership actively supports preparedness initiatives", "max": 10,
+          "ratings": [0, 2.5, 5, 7.5, 10],
+          "feedback": [
+            "Engage leadership through a brief presentation on resilience risks and benefits. Start with quick wins to demonstrate value.",
+            "Identify barriers to leadership engagement. Consider linking resilience to strategic priorities or compliance obligations.",
+            "Build leadership support by demonstrating how preparedness initiatives reduce risk and protect the school's reputation.",
+            "Encourage leadership to visibly champion resilience initiatives and participate in exercises.",
+            "Maintain leadership engagement through regular updates and involvement in exercises and planning."
+          ]
+        },
+        {
+          "row": 1, "label": "Resilience is integrated into strategic planning", "max": 10,
+          "ratings": [0, 2.5, 5, 7.5, 10],
+          "feedback": [
+            "Include resilience as a standing item in strategic planning. Link preparedness to long-term school sustainability.",
+            "Advocate for resilience considerations in strategic discussions. Highlight how disruptions impact strategic objectives.",
+            "Strengthen the connection between resilience and strategy by identifying how key risks could affect strategic goals.",
+            "Ensure resilience is explicitly referenced in strategic plans with defined objectives and accountability.",
+            "Continue to align resilience initiatives with strategic priorities and review annually."
+          ]
+        },
+        {
+          "row": 2, "label": "Roles and responsibilities are clearly defined", "max": 10,
+          "ratings": [0, 2.5, 5, 7.5, 10],
+          "feedback": [
+            "Document key resilience roles in position descriptions and emergency plans. Communicate responsibilities to all staff.",
+            "Review and clarify resilience roles. Ensure wardens, incident teams, and coordinators have documented responsibilities.",
+            "Formalise role definitions and ensure staff understand their responsibilities through training and documentation.",
+            "Review resilience roles annually and after exercises to ensure they remain current and understood.",
+            "Maintain role clarity through regular reviews, onboarding processes, and exercise participation."
+          ]
+        }
+      ]
+    },
+    "q17": {
+      "section": "Emergency Management Preparedness", "kind": "single", "max": 15,
+      "ratings": [15, 10, 5, 2.5, 2.5, 0, 0],
+      "feedback": [null, null, null, null, null, null, null]
+    },
+    "q18": {
+      "section": "Emergency Management Preparedness", "kind": "erp_conditional", "max": 20,
+      "overrideIndex": 0,
+      "ratings": [20, 2.5, 2.5, 2.5, 2.5, 0],
+      "feedback": [
+        "Ensure the Emergency Response Plan is clearly documented, easily accessible, and includes all relevant procedures (evacuation, lockdown, shelter-in-place, medical emergencies). Review annually and after any incidents or site changes.",
+        "Develop a comprehensive Emergency Response Plan that consolidates all emergency procedures into a single, coordinated document.",
+        "Develop a comprehensive Emergency Response Plan that consolidates all emergency procedures into a single, coordinated document.",
+        "Develop a comprehensive Emergency Response Plan that consolidates all emergency procedures into a single, coordinated document.",
+        "Develop a comprehensive Emergency Response Plan that consolidates all emergency procedures into a single, coordinated document.",
+        "Develop a comprehensive Emergency Response Plan covering evacuation, lockdown, shelter-in-place, and medical emergency procedures as a priority."
+      ]
+    },
+    "q19": {
+      "section": "Emergency Management Preparedness", "kind": "single", "max": 15,
+      "ratings": [0, 2.5, 5, 10, 15],
+      "feedback": [
+        "Prioritise staff training and clear communication of emergency roles. Conduct regular drills and provide accessible reference materials.",
+        "Increase training frequency and ensure all staff receive role-specific guidance. Use drills to reinforce understanding.",
+        "Build staff confidence through more frequent exercises and post-drill debriefs. Address any gaps identified during practice.",
+        "Continue regular training and use exercises to maintain confidence and identify improvement areas.",
+        "Maintain staff confidence through ongoing training, regular exercises, and clear onboarding processes for new staff."
+      ]
+    },
+    "q20": {
+      "section": "Emergency Management Preparedness", "kind": "grid_average", "max": 40,
+      "columnRatings": [0, 10, 20, 30, 40],
+      "feedback": [
+        "Establish a regular exercise program immediately. Start with basic evacuation and lockdown drills and progress to other scenarios.",
+        "Increase emergency exercise frequency to at least annual. Regular practice builds muscle memory and identifies gaps before real incidents.",
+        "Consider increasing emergency exercises to twice yearly to cover different scenarios and maintain staff readiness throughout the year.",
+        "Vary scenarios and variables across exercises and use debriefs to drive continuous improvement. Consider conducting drills during recess / lunch, incorporating casualties, refusals and mobility impairments.",
+        "Maintain variety in exercise scenarios and continue to incorporate lessons learned. Consider conducting drills during recess / lunch, incorporating casualties, refusals and mobility impairments."
+      ]
+    },
+    "q21": {
+      "section": "Emergency Management Preparedness", "kind": "single", "max": 10,
+      "ratings": [10, 5, 2.5, 0, 0],
+      "feedback": [
+        "Continue capturing lessons learned from exercises and tracking actions to completion. Share insights with staff to reinforce learning.",
+        "Formalise the debrief process. Document findings after every exercise and assign accountability for improvement actions.",
+        "Introduce a standard debrief template and process. Without documentation, valuable lessons are lost and the same issues recur.",
+        "Establish a formal debrief process for all exercises. Document observations, identify improvements, and track actions to completion.",
+        "Confirm whether debriefs occur and findings are recorded. If not, implement a simple process to capture and act on lessons learned."
+      ]
+    },
+    "q22": {
+      "section": "Emergency Management Preparedness", "kind": "single", "max": 10,
+      "ratings": [10, 5, 0, 0],
+      "feedback": [
+        "Continue to review evacuation diagrams after any site changes and ensure they are clearly displayed in all buildings.",
+        "Prioritise updating outdated evacuation diagrams. Ensure all buildings have current, clearly displayed evacuation routes and assembly points.",
+        "Update all evacuation diagrams as a priority. Ensure they reflect current layouts, exits, and assembly points. Display prominently in all areas.",
+        "Conduct an audit of all evacuation diagrams. Identify outdated or missing diagrams and schedule updates to ensure compliance and clarity."
+      ]
+    },
+    "q23": {
+      "section": "Critical Incident Management Capability", "kind": "single", "max": 20,
+      "ratings": [20, 10, 0, 0],
+      "feedback": [
+        "Ensure the Critical Incident Management Plan is tested through regular desktop exercises, reviewed annually, and that the Critical Incident Management Team is trained in its use. Confirm the plan covers escalation protocols, communications, and recovery.",
+        "Prioritise updating the Critical Incident Management Plan. Review team roles, contact details, escalation protocols, and communication templates. Test through desktop exercises and train the team in its application.",
+        "Develop a Critical Incident Management Plan as a priority. Include incident assessment and escalation protocols, defined team roles, stakeholder communications, and recovery planning. Establish a Critical Incident Management Team and conduct regular training and exercises.",
+        "Confirm whether a Critical Incident Management Plan exists and assess its currency. If no plan exists, develop one covering escalation, team roles, communications, and recovery. Ensure the team is trained and the plan is tested through exercises."
+      ]
+    },
+    "q24": {
+      "section": "Critical Incident Management Capability", "kind": "single", "max": 10,
+      "ratings": [10, 0, 0],
+      "feedback": [
+        "Ensure Critical Incident Management Team members are trained, understand their roles, and participate in regular exercises to maintain readiness.",
+        "Establish a Critical Incident Management Team with defined roles. Include senior leadership and key functional representatives.",
+        "Clarify whether a formal Critical Incident Management Team exists. If not, establish one with clear membership, roles, and activation procedures."
+      ]
+    },
+    "q25": {
+      "section": "Critical Incident Management Capability", "kind": "single", "max": 20,
+      "ratings": [20, 15, 10, 5, 2.5, 0, 0],
+      "feedback": [
+        "Maintain quarterly CIMT training frequency and vary training content to cover different incident types and team functions.",
+        "Ensure CIMT training covers a range of scenarios and includes all team members, including deputies and alternates.",
+        "Consider increasing CIMT training to six-monthly to maintain team readiness. Supplement with desktop exercises between formal training sessions.",
+        "Increase CIMT training frequency to at least annually. Infrequent training leads to skill decay and reduced confidence during real incidents.",
+        "Schedule CIMT refresher training as a priority. Skills and knowledge fade without regular practice, impacting team effectiveness.",
+        "Implement CIMT training as a priority. Training builds confidence, clarifies roles, and prepares the team to respond effectively.",
+        "Confirm CIMT training history and establish a regular schedule. Aim for at least annual training to maintain team capability."
+      ]
+    },
+    "q26": {
+      "section": "Critical Incident Management Capability", "kind": "single", "max": 20,
+      "ratings": [20, 15, 10, 5, 2.5, 0, 0],
+      "feedback": [
+        "Vary desktop exercise scenarios (e.g., student fatality, cyber attack, bushfire) to build broad capability and test different aspects of the plan.",
+        "Ensure desktop exercises test different scenarios and involve all CIMT members. Use debriefs to identify improvements.",
+        "Consider increasing desktop exercises to six-monthly. Desktop exercises are low-cost and highly effective for testing plans and building team confidence.",
+        "Increase desktop exercise frequency to at least annually. Regular practice identifies plan gaps and builds team confidence before real incidents occur.",
+        "Schedule a desktop exercise as a priority. Extended gaps between exercises mean plans remain untested and teams unprepared.",
+        "Conduct a desktop exercise as a priority. This is the most effective way to test the plan, identify gaps, and build team readiness.",
+        "Confirm desktop exercise history and establish a regular schedule. Desktop exercises are essential for testing plans and team preparedness."
+      ]
+    },
+    "q27": {
+      "section": "Critical Incident Management Capability", "kind": "grid_average", "max": 20,
+      "columnRatings": [0, 5, 10, 15, 20],
+      "feedback": [
+        "Prioritise developing the Critical Incident Management Plan and team. Start with the highest-risk scenarios and build capability progressively.",
+        "Identify gaps in current critical incident preparedness. Focus on developing plans, training the team, and conducting exercises for key scenarios.",
+        "Continue building critical incident capability through regular training and exercises. Test plans against a variety of scenarios to identify improvement areas.",
+        "Maintain critical incident readiness through regular exercises, plan reviews, and team training. Consider emerging risks in planning.",
+        "Continue regular exercises, incorporate lessons learned, and stay current with emerging risks and best practice."
+      ]
+    },
+    "q29": {
+      "section": "Critical Incident Management Capability", "kind": "multi_sum", "max": 27.5,
+      "ratings": [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 0, 0],
+      "feedback": "Review the Critical Incident Management Plan against this checklist and prioritise adding any missing elements: incident assessment and escalation protocols, defined leadership roles, stakeholder communications processes, pre-scripted templates, media/reputational considerations, parent/guardian reunification arrangements, staging area protocols, meeting agenda templates, information management protocols, SITREP templates, and recovery planning."
+    },
+    "q30": {
+      "section": "Business Continuity and Recovery", "kind": "single", "max": 20,
+      "ratings": [20, 10, 0, 0],
+      "feedback": [
+        "Ensure the Business Continuity Plan is reviewed at least annually, tested through exercises, and covers critical functions including teaching and learning, student welfare, administration, facilities, and other business units. Confirm staff are aware of their roles and that recovery priorities are clearly defined.",
+        "Prioritise updating the Business Continuity Plan to reflect current operations, systems, and contacts. Review critical function priorities, recovery timeframes, and resource requirements. Communicate changes to relevant staff and test through a desktop exercise.",
+        "Develop a Business Continuity Plan as a priority. Identify critical school functions (teaching and learning, student welfare, administration, facilities, and other business units) and the resources required to maintain or restore them. Document recovery priorities, timeframes, and responsibilities.",
+        "Confirm whether a documented Business Continuity Plan exists. If one exists, locate it and assess its currency. If not, develop one to ensure the school can maintain critical operations during disruptions and recover effectively."
+      ]
+    },
+    "q31": {
+      "section": "Business Continuity and Recovery", "kind": "single", "max": 20,
+      "ratings": [20, 10, 5, 0, 0],
+      "feedback": [
+        "Continue to review the Business Impact Analysis annually, particularly after significant changes to systems, staffing, or service delivery. Use BIA findings to inform resource allocation and recovery strategies.",
+        "Review the Business Impact Analysis to ensure it reflects current operations, systems, and dependencies. Reassess critical functions, recovery timeframes, and resource requirements, then update the Business Continuity Plan accordingly.",
+        "Prioritise completing the Business Impact Analysis. Identify remaining critical functions to assess, document dependencies and recovery timeframes, and use the findings to strengthen the Business Continuity Plan.",
+        "Conduct a Business Impact Analysis to identify critical functions and understand the consequences of disruption. Start by listing key functions across teaching, student welfare, administration, and facilities, then assess the impact of their unavailability over time.",
+        "Confirm whether a Business Impact Analysis has been completed. If one exists, assess its currency. If not, conduct a BIA to identify critical functions, dependencies, and recovery priorities."
+      ]
+    },
+    "q33": {
+      "section": "Business Continuity and Recovery", "kind": "single", "max": 20,
+      "ratings": [20, 10, 5, 0, 0],
+      "feedback": [
+        "Continue varying business continuity exercise scenarios and exercise types (desktop, functional, full-scale) to test different aspects of arrangements. Document lessons learned and track improvement actions to completion.",
+        "Schedule a business continuity test within the next six months to validate current procedures, contact details, and recovery capabilities. Consider a desktop exercise as an efficient way to re-engage staff and identify gaps.",
+        "Prioritise conducting a business continuity exercise to validate the plan remains fit for purpose. Start with a desktop exercise to identify critical gaps before progressing to more complex scenarios.",
+        "Establish a regular business continuity testing schedule, starting with a simple desktop exercise. Testing identifies gaps, builds staff familiarity, and provides confidence that the school can respond effectively to disruptions.",
+        "Confirm whether business continuity testing has occurred and review any documentation from previous exercises. If no testing has been conducted, schedule a desktop exercise to validate arrangements."
+      ]
+    },
+    "q35": {
+      "section": "Communications Readiness", "kind": "rating_position", "max": 10,
+      "ratings": [0, 2.5, 5, 7.5, 10],
+      "feedback": [
+        "Review communication systems and processes to identify barriers to rapid family messaging. Ensure parent/guardian contact details are current, test the mass notification system regularly, and prepare pre-drafted message templates for common scenarios.",
+        "Review whether communication systems can reach all families quickly, confirm contact data is accurate and complete, and establish clear processes for who authorises and sends messages during incidents. Test arrangements regularly.",
+        "Identify specific barriers to faster family communication and address them — this may include system limitations, data quality, or unclear processes. Consider pre-drafted templates and regular testing to reduce response time.",
+        "Continue to maintain accurate contact data, test communication systems regularly, and refine messaging templates. Consider whether all scenarios are covered and whether backup communication methods exist if primary systems fail.",
+        "Maintain rapid family communication capability through regular testing, keeping contact data current, and reviewing message templates. Ensure backup communication methods are available and staff know how to activate them."
+      ]
+    },
+    "q36": {
+      "section": "Communications Readiness", "kind": "single", "max": 10,
+      "ratings": [10, 5, 0, 0],
+      "feedback": [
+        "Ensure communication templates cover a range of scenarios (emergency evacuation, lockdown, medical incident, operational disruptions, critical incidents) and are reviewed regularly for accuracy and tone. Confirm staff know where to access them and who has authority to approve and send communications. Establish, document, and test alternate communication channels to ensure messages can still be sent if primary systems are unavailable.",
+        "Expand the communication template library to cover additional scenarios. Include initial notification, update, and all-clear messages, holding statements, reception scripts, and website incident page scripts. Store templates in an accessible location and ensure multiple staff members can access them. Establish, document, and test alternate communication channels to ensure messages can still be sent if primary systems are unavailable.",
+        "Develop pre-prepared communication templates as a priority. Create templates for common scenarios including emergency evacuation, lockdown, medical incidents, and operational disruptions. Include placeholders for incident-specific details and ensure templates are easily accessible. Establish, document, and test alternate communication channels to ensure messages can still be sent if primary systems are unavailable.",
+        "Confirm whether pre-prepared communication templates exist and where they are stored. If templates are available, ensure staff know how to access them. If not, develop templates for common incident scenarios. Establish, document, and test alternate communication channels to ensure messages can still be sent if primary systems are unavailable."
+      ]
+    }
+  }
+}

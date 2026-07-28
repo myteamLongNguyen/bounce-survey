@@ -166,6 +166,29 @@
   color: var(--brs-muted);
 }
 
+.brs-lookup {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  background: var(--brs-accent-soft);
+  border-radius: var(--brs-radius);
+}
+
+.brs-lookup .brs-body {
+  margin: 0 0 0.5rem;
+}
+
+.brs-lookup .brs-r-lookup-form {
+  margin-top: 0;
+}
+
+.brs-lookup .brs-r-btn {
+  background: var(--brs-accent);
+}
+
+.brs-lookup .brs-r-btn:hover {
+  opacity: 0.9;
+}
+
 .brs-disclosure {
   margin: 0 0 1.25rem;
   padding: 0.85rem 1rem;

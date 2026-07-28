@@ -14,6 +14,7 @@ async function boot() {
 
     window.BRS_DATA = {
       restUrl: "/mock-submit",
+      resultsUrlBase: "/mock-results/",
       nonce: "dev",
       survey,
       copy: COPY,

@@ -1,24 +1,35 @@
 import { useState, useRef } from 'react';
 import Question, { OTHER } from './Question.jsx';
+import Results, { ReferenceLookupForm } from './Results.jsx';
+import './results.css';
 
 export default function Survey() {
   // Read at render time, not at module scope. ES module imports are evaluated
   // before the body of the module that imports them, so a top-level read here
   // would run before main.jsx has a chance to set up the dev mock.
-  const { restUrl, nonce, survey, copy, banner } = window.BRS_DATA;
+  const { restUrl, resultsUrlBase, nonce, survey, copy, banner } = window.BRS_DATA;
   const sections = survey.sections;
+
+  // A reference in the URL (shared link, or a bookmark from a previous visit)
+  // opens straight into the results view - same page, no separate page to route to.
+  const [resultsRef, setResultsRef] = useState(
+    () => new URLSearchParams(window.location.search).get('ref') || null
+  );
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [honeypot, setHoneypot] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | submitting | done | error
+  const [status, setStatus] = useState('idle'); // idle | submitting | error
   const [error, setError] = useState(null);
-  const [reference, setReference] = useState(null);
   const [showMissing, setShowMissing] = useState(false);
 
   const topRef = useRef(null);
   const isLast = step === sections.length - 1;
   const section = sections[step];
+
+  if (resultsRef) {
+    return <Results reference={resultsRef} restUrlBase={resultsUrlBase} onBack={() => setResultsRef(null)} />;
+  }
 
   function setAnswer(id, value) {
     setAnswers((prev) => ({ ...prev, [id]: value }));
@@ -105,30 +116,13 @@ export default function Survey() {
         return;
       }
 
-      setReference(data.reference);
-      setStatus('done');
-      scrollTop();
+      // Straight into the results view, in place, on this same page - no
+      // confirmation screen, no navigation.
+      setResultsRef(data.reference);
     } catch {
       setError(copy.errorNetwork);
       setStatus('error');
     }
-  }
-
-  if (status === 'done') {
-    const email = answers.q57;
-
-    return (
-      <div className="brs-panel brs-panel--done" role="status">
-        <h2 className="brs-heading">{copy.successTitle}</h2>
-        <p className="brs-body">{copy.successBody}</p>
-        <p className="brs-reference">{reference}</p>
-        {email && (
-          <p className="brs-body brs-body--muted">
-            We&rsquo;ll send your personalised results to {email} once they&rsquo;re ready.
-          </p>
-        )}
-      </div>
-    );
   }
 
   const pct = Math.round(((step + 1) / sections.length) * 100);
@@ -163,6 +157,11 @@ export default function Survey() {
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="brs-lookup">
+            <p className="brs-body brs-body--muted">Already submitted? Enter your reference to view your results.</p>
+            <ReferenceLookupForm onSubmit={setResultsRef} />
           </div>
 
           {survey.formNote && <p className="brs-form-note">{survey.formNote}</p>}

@@ -1,0 +1,348 @@
+/*
+ * Scoped under .brs-results so the host theme cannot leak in or out, same
+ * approach as survey.css. Deliberately its own token set (navy, not the
+ * survey's maroon) to match the report mockup this was built from.
+ */
+.brs-results {
+  --brs-r-navy: #16294f;
+  --brs-r-navy-soft: #22345c;
+  --brs-r-ink: #16202b;
+  --brs-r-muted: #5c6b7a;
+  --brs-r-line: #e3e7ec;
+  --brs-r-accent: #83465b;
+  --brs-r-radius: 10px;
+  --brs-r-page: #eef1f6;
+  --brs-r-font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  box-sizing: border-box;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 0 1.5rem 2.5rem;
+  background: var(--brs-r-page);
+  color: var(--brs-r-ink);
+  font-family: var(--brs-r-font);
+  font-size: 1rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.brs-results *,
+.brs-results *::before,
+.brs-results *::after {
+  box-sizing: inherit;
+}
+
+.brs-r-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.75rem 2rem;
+  background: var(--brs-r-navy);
+  color: #fff;
+  border-radius: 0 0 var(--brs-r-radius) var(--brs-r-radius);
+}
+
+.brs-r-header-title h1 {
+  margin: 0 0 0.15rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.brs-r-header-title p {
+  margin: 0;
+  color: #c7d0e8;
+  font-size: 0.95rem;
+}
+
+.brs-r-header-meta {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.brs-r-header-meta > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+  padding: 0.5rem 0.85rem;
+  background: var(--brs-r-navy-soft);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+.brs-r-header-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9fb0d6;
+}
+
+.brs-r-header-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.brs-r-card {
+  max-width: 64rem;
+  margin: 1.25rem auto 0;
+  padding: 1.5rem 2rem;
+  background: #fff;
+  border-radius: var(--brs-r-radius);
+  box-shadow: 0 1px 3px rgba(22, 41, 79, 0.08);
+}
+
+.brs-r-panel-heading {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.brs-r-panel-number {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--brs-r-navy);
+  color: #fff;
+  font-weight: 700;
+}
+
+.brs-r-panel-heading h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.15rem;
+  color: var(--brs-r-navy);
+}
+
+.brs-r-panel-heading p {
+  margin: 0;
+  color: var(--brs-r-muted);
+  font-size: 0.92rem;
+}
+
+.brs-r-body {
+  color: var(--brs-r-muted);
+  margin: 0;
+}
+
+.brs-r-error {
+  color: #a3320b;
+  font-weight: 600;
+}
+
+/* Best-practice strip -------------------------------------------------- */
+
+.brs-r-strip-wrap {
+  overflow-x: auto;
+}
+
+.brs-r-strip {
+  display: flex;
+  gap: 3px;
+  min-width: 34rem;
+}
+
+.brs-r-strip-seg {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.85rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: center;
+  opacity: 0.55;
+}
+
+.brs-r-strip-seg--active {
+  opacity: 1;
+  outline: 3px solid var(--brs-r-navy);
+  outline-offset: 2px;
+}
+
+.brs-r-strip-callout {
+  position: absolute;
+  top: -1.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.25rem 0.6rem;
+  background: var(--brs-r-navy);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.brs-r-strip-callout::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--brs-r-navy);
+}
+
+/* Peer bell curve -------------------------------------------------------- */
+
+.brs-r-curve-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brs-r-curve {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.brs-r-curve-area {
+  fill: rgba(22, 41, 79, 0.08);
+}
+
+.brs-r-curve-line {
+  fill: none;
+  stroke: var(--brs-r-navy);
+  stroke-width: 2;
+}
+
+.brs-r-marker {
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.brs-r-curve-tick {
+  font-size: 11px;
+  fill: var(--brs-r-muted);
+}
+
+.brs-r-curve-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.brs-r-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--brs-r-ink);
+  font-weight: 600;
+}
+
+.brs-r-legend-item i {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 2px;
+}
+
+.brs-r-legend-note {
+  font-size: 0.82rem;
+  color: var(--brs-r-muted);
+}
+
+/* Recommended actions ----------------------------------------------------- */
+
+.brs-r-actions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brs-r-action {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.75rem 0.9rem;
+  background: #f7f8fb;
+  border: 1px solid var(--brs-r-line);
+  border-radius: 6px;
+  font-size: 0.92rem;
+}
+
+.brs-r-action-check {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.15rem;
+  border: 2px solid var(--brs-r-navy);
+  border-radius: 4px;
+}
+
+/* Reference lookup --------------------------------------------------------- */
+
+.brs-r-lookup {
+  max-width: 30rem;
+  margin: 3rem auto;
+  text-align: center;
+}
+
+.brs-r-lookup-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.brs-r-input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--brs-r-line);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.brs-r-btn {
+  padding: 0.6rem 1.1rem;
+  background: var(--brs-r-navy);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.brs-r-btn:hover {
+  background: var(--brs-r-navy-soft);
+}
+
+.brs-r-btn--ghost {
+  background: transparent;
+  color: var(--brs-r-navy);
+  border: 1px solid var(--brs-r-line);
+}
+
+.brs-r-btn--ghost:hover {
+  background: var(--brs-r-page);
+}
+
+.brs-r-back-link {
+  margin-top: 0.4rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #c7d0e8;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.brs-r-back-link:hover {
+  color: #fff;
+}

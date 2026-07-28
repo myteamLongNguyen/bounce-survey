@@ -33,6 +33,97 @@ class BRS_REST {
 				'permission_callback' => '__return_true',
 			)
 		);
+
+		register_rest_route(
+			self::REST_NS,
+			'/results/(?P<reference>[A-Z0-9-]+)',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'handle_results' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	/**
+	 * The reference (10 random characters, unguessable) is the only access
+	 * control here - same trust model as the rest of this anonymous survey.
+	 * Rate limited separately from /submit so a burst of legitimate people
+	 * viewing their own results right after submitting doesn't get confused
+	 * with someone trying to enumerate references.
+	 */
+	public static function handle_results( WP_REST_Request $request ) {
+		if ( self::is_results_rate_limited() ) {
+			return new WP_Error(
+				'brs_rate_limited',
+				'Too many requests from this connection. Please try again later.',
+				array( 'status' => 429 )
+			);
+		}
+
+		self::record_results_rate_hit();
+
+		$reference = sanitize_text_field( $request->get_param( 'reference' ) );
+		$row       = BRS_DB::get_by_reference( $reference );
+
+		if ( ! $row || null === $row->total_score ) {
+			return new WP_Error( 'brs_not_found', 'No results found for that reference.', array( 'status' => 404 ) );
+		}
+
+		$scored  = json_decode( $row->category_scores, true );
+		$answers = json_decode( $row->answers, true );
+
+		if ( ! is_array( $scored ) ) {
+			return new WP_Error( 'brs_not_found', 'No results found for that reference.', array( 'status' => 404 ) );
+		}
+
+		return new WP_REST_Response(
+			array(
+				'reference'      => $row->reference,
+				'schoolName'     => isset( $answers['q59'] ) ? $answers['q59'] : '',
+				'submittedAt'    => $row->created_at,
+				'score'          => $scored,
+				'maturityLevels' => BRS_Scoring::model()['maturityLevels'],
+				'actions'        => self::actions_with_labels( BRS_Scoring::recommended_actions( $scored, 4 ) ),
+				'peers'          => BRS_Scoring::peer_summary( $row->reference, $row->total_score ),
+			),
+			200
+		);
+	}
+
+	/**
+	 * BRS_Scoring doesn't know current question wording (it only reads the
+	 * structural scoring config) - fill in each recommended action's label
+	 * here from BRS_Config, which layers admin wording overrides on top.
+	 */
+	private static function actions_with_labels( $items ) {
+		return array_map(
+			function ( $item ) {
+				if ( null === $item['label'] ) {
+					$q = BRS_Config::question( $item['id'] );
+					// q16a/q16b/q16c aren't real question ids - fall back to the
+					// row label already carried on the item in that case.
+					$item['label'] = $q ? $q['text'] : $item['label'];
+				}
+
+				return $item;
+			},
+			$items
+		);
+	}
+
+	private static function results_rate_key() {
+		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+		return 'brs_results_rate_' . md5( $ip );
+	}
+
+	private static function is_results_rate_limited() {
+		return (int) get_transient( self::results_rate_key() ) >= 30;
+	}
+
+	private static function record_results_rate_hit() {
+		$key = self::results_rate_key();
+		set_transient( $key, (int) get_transient( $key ) + 1, self::RATE_WINDOW );
 	}
 
 	public static function handle_submit( WP_REST_Request $request ) {
@@ -79,7 +170,8 @@ class BRS_REST {
 			$answers['q57']    = $email;
 		}
 
-		$reference = BRS_DB::insert( $answers, $email );
+		$scored    = BRS_Scoring::score( $answers );
+		$reference = BRS_DB::insert( $answers, $email, 'web', null, $scored );
 
 		if ( is_wp_error( $reference ) ) {
 			return new WP_Error( 'brs_save_failed', 'Could not save your responses.', array( 'status' => 500 ) );

@@ -18,6 +18,7 @@ define( 'BRS_TABLE', 'brs_submissions' );
 
 require_once BRS_PATH . 'includes/class-brs-config.php';
 require_once BRS_PATH . 'includes/class-brs-db.php';
+require_once BRS_PATH . 'includes/class-brs-scoring.php';
 require_once BRS_PATH . 'includes/class-brs-onedrive.php';
 require_once BRS_PATH . 'includes/class-brs-rest.php';
 require_once BRS_PATH . 'includes/class-brs-admin.php';
@@ -71,15 +72,16 @@ add_shortcode(
 			'brs-survey',
 			'BRS_DATA',
 			array(
-				'restUrl'   => esc_url_raw( rest_url( 'bounce/v1/submit' ) ),
-				'nonce'     => wp_create_nonce( 'wp_rest' ),
-				'survey'    => BRS_Config::survey_for_display(),
-				'copy'      => BRS_Config::copy(),
+				'restUrl'        => esc_url_raw( rest_url( 'bounce/v1/submit' ) ),
+				'resultsUrlBase' => esc_url_raw( rest_url( 'bounce/v1/results/' ) ),
+				'nonce'          => wp_create_nonce( 'wp_rest' ),
+				'survey'         => BRS_Config::survey_for_display(),
+				'copy'           => BRS_Config::copy(),
 				// A real static file (assets/banner.png), not something Vite
 				// processes - same reasoning as build/survey.js: WordPress
 				// serves it directly, so it works at whatever URL the plugin
 				// ends up installed at.
-				'banner'    => file_exists( BRS_PATH . 'assets/banner.png' ) ? BRS_URL . 'assets/banner.png' : '',
+				'banner'         => file_exists( BRS_PATH . 'assets/banner.png' ) ? BRS_URL . 'assets/banner.png' : '',
 			)
 		);
 
