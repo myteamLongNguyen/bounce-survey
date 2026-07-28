@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class BRS_DB {
 
-	const SCHEMA_VERSION = 2;
+	const SCHEMA_VERSION = 3;
 	const SCHEMA_OPTION  = 'brs_schema_version';
 
 	public static function table() {
@@ -53,9 +53,56 @@ class BRS_DB {
 	}
 
 	public static function maybe_upgrade() {
-		if ( (int) get_option( self::SCHEMA_OPTION, 0 ) < self::SCHEMA_VERSION ) {
-			self::install();
+		$previous = (int) get_option( self::SCHEMA_OPTION, 0 );
+
+		if ( $previous >= self::SCHEMA_VERSION ) {
+			return;
 		}
+
+		self::install();
+
+		// v3 added scoring - anything submitted before that (total_score still
+		// NULL) never got a score, so it 404s on the results page and is
+		// silently excluded from the peer comparison. Score it now, once,
+		// using the current scoring model - same as any newly-imported row.
+		if ( $previous < 3 ) {
+			self::backfill_scores();
+		}
+	}
+
+	/**
+	 * @return int Number of rows scored.
+	 */
+	private static function backfill_scores() {
+		global $wpdb;
+
+		$rows = $wpdb->get_results( 'SELECT id, answers FROM ' . self::table() . ' WHERE total_score IS NULL' );
+		$done = 0;
+
+		foreach ( $rows as $row ) {
+			$answers = json_decode( $row->answers, true );
+
+			if ( ! is_array( $answers ) ) {
+				continue;
+			}
+
+			$scored = BRS_Scoring::score( $answers );
+
+			$wpdb->update(
+				self::table(),
+				array(
+					'total_score'     => $scored['total'],
+					'category_scores' => wp_json_encode( $scored ),
+				),
+				array( 'id' => $row->id ),
+				array( '%f', '%s' ),
+				array( '%d' )
+			);
+
+			++$done;
+		}
+
+		return $done;
 	}
 
 	/**

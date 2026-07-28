@@ -121,6 +121,10 @@ function Header({ data, onBack }) {
           <span className="brs-r-header-label">Date</span>
           <span className="brs-r-header-value">{dateLabel}</span>
         </div>
+        <div>
+          <span className="brs-r-header-label">Reference</span>
+          <span className="brs-r-header-value">{data.reference}</span>
+        </div>
       </div>
     </header>
   );
