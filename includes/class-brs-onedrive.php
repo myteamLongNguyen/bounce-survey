@@ -67,7 +67,13 @@ class BRS_OneDrive {
 			'state'         => $state,
 		);
 
-		return 'https://login.microsoftonline.com/' . rawurlencode( $s['tenant_id'] ) . '/oauth2/v2.0/authorize?' . http_build_query( $params );
+		// "organizations", not the configured tenant_id: hitting a specific
+		// tenant's endpoint requires the signing-in account to already exist
+		// there (member or pre-provisioned guest) even for a multi-tenant app
+		// registration - it blocks the ad hoc guest sign-in this needs, since
+		// the destination folder usually lives in a different tenant than
+		// wherever this app was registered.
+		return 'https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?' . http_build_query( $params );
 	}
 
 	/**
@@ -84,7 +90,7 @@ class BRS_OneDrive {
 		$s = self::settings();
 
 		$response = wp_remote_post(
-			self::token_endpoint( $s['tenant_id'] ),
+			self::token_endpoint(),
 			array(
 				'timeout' => 20,
 				'body'    => array(
@@ -101,8 +107,10 @@ class BRS_OneDrive {
 		return self::store_token_response( $response );
 	}
 
-	private static function token_endpoint( $tenant_id ) {
-		return 'https://login.microsoftonline.com/' . rawurlencode( $tenant_id ) . '/oauth2/v2.0/token';
+	// Must match the issuer used in authorize_url() above - "organizations",
+	// not the configured tenant_id.
+	private static function token_endpoint() {
+		return 'https://login.microsoftonline.com/organizations/oauth2/v2.0/token';
 	}
 
 	private static function store_token_response( $response ) {
@@ -154,7 +162,7 @@ class BRS_OneDrive {
 
 		$s        = self::settings();
 		$response = wp_remote_post(
-			self::token_endpoint( $s['tenant_id'] ),
+			self::token_endpoint(),
 			array(
 				'timeout' => 20,
 				'body'    => array(
