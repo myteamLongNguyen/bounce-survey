@@ -28,6 +28,7 @@ class BRS_Admin {
 
 		add_submenu_page( 'brs-submissions', 'Submissions', 'Submissions', self::CAPABILITY, 'brs-submissions', array( __CLASS__, 'render_submissions' ) );
 		add_submenu_page( 'brs-submissions', 'Question wording', 'Question wording', self::CAPABILITY, 'brs-wording', array( __CLASS__, 'render_wording_editor' ) );
+		add_submenu_page( 'brs-submissions', 'Scoring & Feedback', 'Scoring & Feedback', self::CAPABILITY, 'brs-scoring', array( __CLASS__, 'render_scoring_editor' ) );
 		add_submenu_page( 'brs-submissions', 'OneDrive Sync', 'OneDrive Sync', self::CAPABILITY, 'brs-onedrive', array( __CLASS__, 'render_onedrive_settings' ) );
 	}
 
@@ -431,6 +432,533 @@ class BRS_Admin {
 		update_option( BRS_Config::WORDING_OPTION, $clean );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=brs-wording&brs_saved=1' ) );
+		exit;
+	}
+
+	/**
+	 * Lets non-technical staff tune the maturity model - point values per
+	 * answer, score thresholds per level, and the feedback text shown for
+	 * each answer - without touching code or data/scoring.json directly.
+	 *
+	 * Same safety rule as the wording editor: this can only change *values*
+	 * within the existing shape (how many ratings a question has, how many
+	 * levels exist). Adding/removing/reordering answers or levels needs a
+	 * developer, because scoring matches answers by position.
+	 *
+	 * Because BRS_DB::insert() snapshots the scored result onto the
+	 * submission row at submit time, changes made here only affect
+	 * submissions from that point forward - already-issued reports never
+	 * silently change.
+	 */
+	public static function render_scoring_editor() {
+		$model = BRS_Scoring::model();
+		?>
+		<div class="wrap">
+			<h1>Scoring &amp; Feedback</h1>
+
+			<?php if ( isset( $_GET['brs_scoring_saved'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>Scoring configuration saved. New submissions will be scored with these values.</p></div>
+			<?php endif; ?>
+
+			<?php if ( isset( $_GET['brs_scoring_reset'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>Scoring configuration reset to the plugin's defaults.</p></div>
+			<?php endif; ?>
+
+			<?php if ( ! empty( $_GET['brs_scoring_error'] ) ) : ?>
+				<div class="notice notice-error"><p><?php echo esc_html( sanitize_text_field( wp_unslash( $_GET['brs_scoring_error'] ) ) ); ?></p></div>
+			<?php endif; ?>
+
+			<div class="notice notice-warning">
+				<p>
+					<strong>Safe to edit:</strong> point values for each answer, the score thresholds for
+					each maturity level, and the recommendation text shown for each answer.
+				</p>
+				<p>
+					Changes only apply to <strong>new</strong> submissions from the moment you save -
+					already-submitted reports keep the score and feedback they were given at the time, so
+					past results never silently change.
+				</p>
+				<p>
+					<strong>Do not</strong> try to add, remove or reorder answers or levels here - there is
+					nowhere to do that in this screen on purpose. That kind of change affects how responses
+					are stored and compared, and needs a developer.
+				</p>
+			</div>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="brs_save_scoring">
+				<?php wp_nonce_field( 'brs_save_scoring' ); ?>
+
+				<h2>Overall maturity levels</h2>
+				<p style="max-width:760px;">The total score (summed across every scored question) needed to reach each level.</p>
+				<table class="widefat striped" style="max-width:760px;">
+					<thead>
+						<tr><th>Level</th><th>Label</th><th>Score needed to reach this level</th></tr>
+					</thead>
+					<tbody>
+					<?php foreach ( $model['maturityLevels'] as $level ) : ?>
+						<tr>
+							<td>Level <?php echo esc_html( $level['level'] ); ?></td>
+							<td><?php echo esc_html( $level['label'] ); ?></td>
+							<td>
+								<?php if ( 1 === $level['level'] ) : ?>
+									<input type="number" value="0" disabled style="width:110px;">
+									<span style="color:#646970;">(always starts at 0)</span>
+								<?php else : ?>
+									<input
+										type="number"
+										step="0.5"
+										name="levels[<?php echo esc_attr( $level['level'] ); ?>][min]"
+										value="<?php echo esc_attr( $level['minInclusive'] ); ?>"
+										style="width:110px;"
+									>
+								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+					<tr>
+						<th>Maximum possible score</th>
+						<td colspan="2">
+							<input type="number" step="0.5" name="denominator" value="<?php echo esc_attr( $model['denominator'] ); ?>" style="width:110px;">
+							<span style="color:#646970;">Top of Level 5 - used to calculate the overall percentage.</span>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+
+				<h2 style="margin-top:2rem;">Domain (section) score thresholds</h2>
+				<p style="max-width:900px;">The score within each domain needed to reach each level - drives the per-domain results on the dashboard.</p>
+				<table class="widefat striped" style="max-width:900px;">
+					<thead>
+						<tr><th>Section</th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5 (max)</th></tr>
+					</thead>
+					<tbody>
+					<?php foreach ( $model['sections'] as $name => $section ) : ?>
+						<tr>
+							<th><?php echo esc_html( $name ); ?></th>
+							<?php foreach ( array( 'L1', 'L2', 'L3', 'L4', 'L5' ) as $anchor_key ) : ?>
+								<td>
+									<input
+										type="number"
+										step="0.5"
+										name="sections[<?php echo esc_attr( $name ); ?>][<?php echo esc_attr( $anchor_key ); ?>]"
+										value="<?php echo esc_attr( $section['anchors'][ $anchor_key ] ); ?>"
+										style="width:90px;"
+									>
+								</td>
+							<?php endforeach; ?>
+						</tr>
+					<?php endforeach; ?>
+					</tbody>
+				</table>
+
+				<h2 style="margin-top:2rem;">Question scoring &amp; feedback</h2>
+
+				<?php foreach ( array_keys( $model['sections'] ) as $section_name ) : ?>
+					<h3><?php echo esc_html( $section_name ); ?></h3>
+					<?php
+					foreach ( $model['questions'] as $id => $q ) :
+						if ( $q['section'] !== $section_name ) {
+							continue;
+						}
+						self::render_scoring_question_card( $id, $q );
+					endforeach;
+					?>
+				<?php endforeach; ?>
+
+				<?php submit_button( 'Save scoring configuration' ); ?>
+			</form>
+
+			<h2 style="margin-top:2rem;">Reset</h2>
+			<p>Discards every override above and reverts to the plugin's shipped defaults.</p>
+			<form
+				method="post"
+				action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+				onsubmit="return confirm('Reset all scoring and feedback to the plugin defaults? This cannot be undone.');"
+			>
+				<input type="hidden" name="action" value="brs_reset_scoring">
+				<?php wp_nonce_field( 'brs_reset_scoring' ); ?>
+				<?php submit_button( 'Reset to defaults', 'secondary' ); ?>
+			</form>
+		</div>
+		<?php
+	}
+
+	/** One card per scored question: option/row labels for context (read-only, current wording) next to editable point values and feedback text. */
+	private static function render_scoring_question_card( $id, $q ) {
+		$config = BRS_Config::question( $id );
+		$text   = $config ? $config['text'] : $id;
+		?>
+		<div style="background:#fff;border:1px solid #c3c4c7;padding:14px;margin:12px 0;max-width:900px;">
+			<p style="margin:0 0 10px;color:#646970;font-size:12px;">
+				ID <code><?php echo esc_html( $id ); ?></code> &middot; max <?php echo esc_html( self::question_max( $q ) ); ?> points
+			</p>
+			<p style="margin:0 0 10px;font-weight:600;"><?php echo esc_html( $text ); ?></p>
+
+			<?php
+			switch ( $q['kind'] ) {
+				case 'single':
+				case 'erp_conditional':
+				case 'multi_sum':
+					self::render_scoring_option_rows( 'questions[' . $id . ']', $q, $config && ! empty( $config['options'] ) ? $config['options'] : array() );
+					break;
+
+				case 'grid_average':
+					self::render_scoring_option_rows( 'questions[' . $id . ']', $q, $config && ! empty( $config['columns'] ) ? $config['columns'] : array(), 'columnRatings' );
+					break;
+
+				case 'rating_position':
+					$count  = count( $q['ratings'] );
+					$labels = array();
+
+					for ( $i = 0; $i < $count; $i++ ) {
+						$label = (string) ( $i + 1 );
+
+						if ( 0 === $i && $config && ! empty( $config['lowLabel'] ) ) {
+							$label .= ' - ' . $config['lowLabel'];
+						} elseif ( $count - 1 === $i && $config && ! empty( $config['highLabel'] ) ) {
+							$label .= ' - ' . $config['highLabel'];
+						}
+
+						$labels[] = $label;
+					}
+
+					self::render_scoring_option_rows( 'questions[' . $id . ']', $q, $labels );
+					break;
+
+				case 'likert_rows':
+					$columns = $config && ! empty( $config['columns'] ) ? $config['columns'] : array();
+
+					foreach ( $q['rows'] as $row ) {
+						echo '<p style="margin:14px 0 4px;font-weight:600;">' . esc_html( $row['label'] ) . '</p>';
+						self::render_scoring_option_rows( 'questions[' . $id . '][rows][' . $row['row'] . ']', $row, $columns );
+					}
+					break;
+			}
+
+			if ( isset( $q['otherRating'] ) ) :
+				?>
+				<p style="margin:14px 0 4px;font-weight:600;">Other (free text answer)</p>
+				<div style="display:flex;gap:10px;align-items:flex-start;">
+					<input
+						type="number"
+						step="0.5"
+						name="questions[<?php echo esc_attr( $id ); ?>][otherRating]"
+						value="<?php echo esc_attr( $q['otherRating'] ); ?>"
+						style="width:90px;flex-shrink:0;"
+					>
+					<textarea
+						name="questions[<?php echo esc_attr( $id ); ?>][otherFeedback]"
+						rows="2"
+						style="flex:1;"
+					><?php echo esc_textarea( isset( $q['otherFeedback'] ) ? $q['otherFeedback'] : '' ); ?></textarea>
+				</div>
+				<?php
+			endif;
+
+			if ( 'multi_sum' === $q['kind'] ) :
+				?>
+				<p style="margin:14px 0 4px;font-weight:600;">Feedback shown when anything is missing from this checklist</p>
+				<textarea
+					name="questions[<?php echo esc_attr( $id ); ?>][feedback]"
+					rows="3"
+					style="width:100%;"
+				><?php echo esc_textarea( is_string( $q['feedback'] ) ? $q['feedback'] : '' ); ?></textarea>
+				<?php
+			endif;
+			?>
+		</div>
+		<?php
+	}
+
+	/** One row per rating: label for context, a number input for points, a textarea for feedback (when this question kind uses per-answer feedback). */
+	private static function render_scoring_option_rows( $name_prefix, $owner, $labels, $ratings_key = 'ratings' ) {
+		$ratings  = $owner[ $ratings_key ];
+		$feedback = isset( $owner['feedback'] ) ? $owner['feedback'] : array();
+		?>
+		<table style="width:100%;border-collapse:collapse;margin-bottom:6px;">
+			<?php foreach ( $ratings as $i => $rating ) : ?>
+				<tr>
+					<td style="width:40%;padding:4px 8px 8px 0;vertical-align:top;">
+						<?php echo esc_html( isset( $labels[ $i ] ) ? $labels[ $i ] : ( 'Option ' . ( $i + 1 ) ) ); ?>
+					</td>
+					<td style="width:90px;padding:4px 8px 8px 0;vertical-align:top;">
+						<input
+							type="number"
+							step="0.5"
+							name="<?php echo esc_attr( $name_prefix ); ?>[<?php echo esc_attr( $ratings_key ); ?>][<?php echo esc_attr( $i ); ?>]"
+							value="<?php echo esc_attr( $rating ); ?>"
+							style="width:80px;"
+						>
+					</td>
+					<td style="padding:4px 0 8px;vertical-align:top;">
+						<?php if ( is_array( $feedback ) ) : ?>
+							<textarea
+								name="<?php echo esc_attr( $name_prefix ); ?>[feedback][<?php echo esc_attr( $i ); ?>]"
+								rows="2"
+								style="width:100%;"
+							><?php echo esc_textarea( isset( $feedback[ $i ] ) && is_string( $feedback[ $i ] ) ? $feedback[ $i ] : '' ); ?></textarea>
+						<?php endif; ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		</table>
+		<?php
+	}
+
+	/** Display-only: the highest score this question can contribute, shown in the card header so staff can sanity-check edits. */
+	private static function question_max( $q ) {
+		if ( 'multi_sum' === $q['kind'] ) {
+			return array_sum( $q['ratings'] );
+		}
+
+		if ( 'grid_average' === $q['kind'] ) {
+			return max( $q['columnRatings'] );
+		}
+
+		if ( 'likert_rows' === $q['kind'] ) {
+			$total = 0;
+
+			foreach ( $q['rows'] as $row ) {
+				$total += max( $row['ratings'] );
+			}
+
+			return $total;
+		}
+
+		$max = max( $q['ratings'] );
+
+		if ( isset( $q['otherRating'] ) ) {
+			$max = max( $max, $q['otherRating'] );
+		}
+
+		return $max;
+	}
+
+	public static function handle_save_scoring() {
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_die( 'You do not have permission to do that.' );
+		}
+
+		check_admin_referer( 'brs_save_scoring' );
+
+		$raw = BRS_Scoring::raw_model();
+
+		$posted_levels      = isset( $_POST['levels'] ) ? (array) wp_unslash( $_POST['levels'] ) : array();
+		$posted_denominator = isset( $_POST['denominator'] ) ? wp_unslash( $_POST['denominator'] ) : null;
+		$posted_sections    = isset( $_POST['sections'] ) ? (array) wp_unslash( $_POST['sections'] ) : array();
+		$posted_questions   = isset( $_POST['questions'] ) ? (array) wp_unslash( $_POST['questions'] ) : array();
+
+		$existing = get_option( BRS_Scoring::OPTION, array() );
+
+		if ( ! is_array( $existing ) ) {
+			$existing = array();
+		}
+
+		// Sections and questions are always posted in full by this form, so
+		// they're rebuilt from scratch each save. Level thresholds are only
+		// replaced if the new values validate - see below - so an invalid
+		// edit there can't wipe out a previously-saved, valid override.
+		$clean              = $existing;
+		$clean['sections']  = array();
+		$clean['questions'] = array();
+
+		$mins         = array( 1 => 0.0 );
+		$levels_valid = true;
+
+		foreach ( array( 2, 3, 4, 5 ) as $level ) {
+			$value = isset( $posted_levels[ $level ]['min'] ) ? $posted_levels[ $level ]['min'] : null;
+
+			if ( ! is_numeric( $value ) ) {
+				$levels_valid = false;
+				continue;
+			}
+
+			$mins[ $level ] = (float) $value;
+		}
+
+		$denominator_valid = is_numeric( $posted_denominator );
+
+		if ( $levels_valid && $denominator_valid && 5 === count( $mins ) ) {
+			$denominator = (float) $posted_denominator;
+			$ascending   = $mins[1] < $mins[2] && $mins[2] < $mins[3] && $mins[3] < $mins[4] && $mins[4] < $mins[5] && $mins[5] <= $denominator;
+
+			if ( $ascending ) {
+				$clean['maturityLevels'] = array();
+
+				foreach ( array( 2, 3, 4, 5 ) as $level ) {
+					$clean['maturityLevels'][ (string) $level ] = $mins[ $level ];
+				}
+
+				$clean['denominator'] = $denominator;
+			} else {
+				$levels_valid = false;
+			}
+		} else {
+			$levels_valid = false;
+		}
+
+		foreach ( $raw['sections'] as $name => $section ) {
+			if ( empty( $posted_sections[ $name ] ) || ! is_array( $posted_sections[ $name ] ) ) {
+				continue;
+			}
+
+			$entry = array();
+
+			foreach ( array( 'L1', 'L2', 'L3', 'L4', 'L5' ) as $anchor_key ) {
+				if ( isset( $posted_sections[ $name ][ $anchor_key ] ) && is_numeric( $posted_sections[ $name ][ $anchor_key ] ) ) {
+					$entry[ $anchor_key ] = (float) $posted_sections[ $name ][ $anchor_key ];
+				}
+			}
+
+			if ( ! empty( $entry ) ) {
+				$clean['sections'][ $name ] = $entry;
+			}
+		}
+
+		foreach ( $raw['questions'] as $id => $q ) {
+			if ( empty( $posted_questions[ $id ] ) || ! is_array( $posted_questions[ $id ] ) ) {
+				continue;
+			}
+
+			$clean_q = self::clean_question_scoring( $q, $posted_questions[ $id ] );
+
+			if ( ! empty( $clean_q ) ) {
+				$clean['questions'][ $id ] = $clean_q;
+			}
+		}
+
+		update_option( BRS_Scoring::OPTION, $clean );
+
+		$redirect = admin_url( 'admin.php?page=brs-scoring&brs_scoring_saved=1' );
+
+		if ( ! $levels_valid ) {
+			$redirect = add_query_arg(
+				'brs_scoring_error',
+				rawurlencode( 'Maturity level thresholds must increase from Level 1 through Level 5 and stay within the maximum possible score, so those were not changed. Everything else was saved.' ),
+				admin_url( 'admin.php?page=brs-scoring' )
+			);
+		}
+
+		wp_safe_redirect( $redirect );
+		exit;
+	}
+
+	/** Builds the override entry for one question from posted form data, validated against that question's original (data/scoring.json) shape. */
+	private static function clean_question_scoring( $q, $posted ) {
+		$entry = array();
+
+		switch ( $q['kind'] ) {
+			case 'single':
+			case 'erp_conditional':
+			case 'rating_position':
+				self::collect_numeric_list( $entry, 'ratings', $posted, $q['ratings'] );
+				self::collect_text_list( $entry, 'feedback', $posted, $q['feedback'] );
+				break;
+
+			case 'multi_sum':
+				self::collect_numeric_list( $entry, 'ratings', $posted, $q['ratings'] );
+
+				if ( isset( $posted['feedback'] ) && is_string( $posted['feedback'] ) ) {
+					$text = sanitize_textarea_field( $posted['feedback'] );
+
+					if ( '' !== $text ) {
+						$entry['feedback'] = $text;
+					}
+				}
+				break;
+
+			case 'grid_average':
+				self::collect_numeric_list( $entry, 'columnRatings', $posted, $q['columnRatings'] );
+				self::collect_text_list( $entry, 'feedback', $posted, $q['feedback'] );
+				break;
+
+			case 'likert_rows':
+				if ( ! empty( $posted['rows'] ) && is_array( $posted['rows'] ) ) {
+					$rows_entry = array();
+
+					foreach ( $q['rows'] as $row ) {
+						$row_posted = isset( $posted['rows'][ $row['row'] ] ) ? $posted['rows'][ $row['row'] ] : null;
+
+						if ( ! is_array( $row_posted ) ) {
+							continue;
+						}
+
+						$row_entry = array();
+						self::collect_numeric_list( $row_entry, 'ratings', $row_posted, $row['ratings'] );
+						self::collect_text_list( $row_entry, 'feedback', $row_posted, $row['feedback'] );
+
+						if ( ! empty( $row_entry ) ) {
+							$rows_entry[ $row['row'] ] = $row_entry;
+						}
+					}
+
+					if ( ! empty( $rows_entry ) ) {
+						$entry['rows'] = $rows_entry;
+					}
+				}
+				break;
+		}
+
+		if ( isset( $q['otherRating'] ) && isset( $posted['otherRating'] ) && is_numeric( $posted['otherRating'] ) ) {
+			$entry['otherRating'] = (float) $posted['otherRating'];
+		}
+
+		if ( isset( $q['otherFeedback'] ) && isset( $posted['otherFeedback'] ) && is_string( $posted['otherFeedback'] ) ) {
+			$text = sanitize_textarea_field( $posted['otherFeedback'] );
+
+			if ( '' !== $text ) {
+				$entry['otherFeedback'] = $text;
+			}
+		}
+
+		return $entry;
+	}
+
+	/** Rebuilds a full-length numeric override array, index by index, falling back to the shipped default wherever the posted value is missing or not numeric. */
+	private static function collect_numeric_list( &$entry, $key, $posted, $original ) {
+		if ( empty( $posted[ $key ] ) || ! is_array( $posted[ $key ] ) ) {
+			return;
+		}
+
+		$list = array();
+
+		foreach ( $original as $i => $value ) {
+			$list[ $i ] = ( isset( $posted[ $key ][ $i ] ) && is_numeric( $posted[ $key ][ $i ] ) )
+				? (float) $posted[ $key ][ $i ]
+				: $value;
+		}
+
+		$entry[ $key ] = $list;
+	}
+
+	/** Same as collect_numeric_list() but for feedback text arrays - only applies to questions whose original feedback is an array (multi_sum's is a single string, handled separately). */
+	private static function collect_text_list( &$entry, $key, $posted, $original ) {
+		if ( ! is_array( $original ) || empty( $posted[ $key ] ) || ! is_array( $posted[ $key ] ) ) {
+			return;
+		}
+
+		$list = array();
+
+		foreach ( $original as $i => $value ) {
+			$list[ $i ] = ( isset( $posted[ $key ][ $i ] ) && is_string( $posted[ $key ][ $i ] ) )
+				? sanitize_textarea_field( $posted[ $key ][ $i ] )
+				: ( is_string( $value ) ? $value : '' );
+		}
+
+		$entry[ $key ] = $list;
+	}
+
+	public static function handle_reset_scoring() {
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_die( 'You do not have permission to do that.' );
+		}
+
+		check_admin_referer( 'brs_reset_scoring' );
+
+		delete_option( BRS_Scoring::OPTION );
+
+		wp_safe_redirect( admin_url( 'admin.php?page=brs-scoring&brs_scoring_reset=1' ) );
 		exit;
 	}
 

@@ -28,6 +28,8 @@ register_activation_hook( __FILE__, array( 'BRS_DB', 'install' ) );
 add_action( 'rest_api_init', array( 'BRS_REST', 'register_routes' ) );
 add_action( 'admin_menu', array( 'BRS_Admin', 'register_menu' ) );
 add_action( 'admin_post_brs_save_wording', array( 'BRS_Admin', 'handle_save_wording' ) );
+add_action( 'admin_post_brs_save_scoring', array( 'BRS_Admin', 'handle_save_scoring' ) );
+add_action( 'admin_post_brs_reset_scoring', array( 'BRS_Admin', 'handle_reset_scoring' ) );
 add_action( 'admin_post_brs_export_csv', array( 'BRS_Admin', 'handle_export_csv' ) );
 add_action( 'admin_post_brs_delete_submission', array( 'BRS_Admin', 'handle_delete_submission' ) );
 add_action( 'admin_post_brs_save_onedrive_settings', array( 'BRS_Admin', 'handle_save_onedrive_settings' ) );

@@ -22,19 +22,196 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class BRS_Scoring {
 
-	private static $model = null;
+	/**
+	 * Admin-edited point values / feedback text, layered on top of the
+	 * shipped data/scoring.json at read time - same pattern as
+	 * BRS_Config::WORDING_OPTION for question wording. The JSON file always
+	 * remains the default/fallback and defines the fixed *shape* (how many
+	 * ratings a question has, how many maturity levels exist, etc); this
+	 * option can only override values within that shape, never change it.
+	 */
+	const OPTION = 'brs_scoring_overrides';
 
-	public static function model() {
-		if ( null === self::$model ) {
-			$raw         = file_get_contents( BRS_PATH . 'data/scoring.json' );
-			self::$model = json_decode( $raw, true );
+	private static $raw_model = null;
+	private static $model     = null;
 
-			if ( ! is_array( self::$model ) ) {
-				self::$model = array( 'denominator' => 0, 'maturityLevels' => array(), 'sections' => array(), 'questions' => array() );
+	/** The untouched contents of scoring.json - no overrides applied. Used to know the original shape (array lengths etc.) when validating admin edits. */
+	public static function raw_model() {
+		if ( null === self::$raw_model ) {
+			$raw             = file_get_contents( BRS_PATH . 'data/scoring.json' );
+			self::$raw_model = json_decode( $raw, true );
+
+			if ( ! is_array( self::$raw_model ) ) {
+				self::$raw_model = array( 'denominator' => 0, 'maturityLevels' => array(), 'sections' => array(), 'questions' => array() );
 			}
 		}
 
+		return self::$raw_model;
+	}
+
+	public static function model() {
+		if ( null === self::$model ) {
+			// json_decode + serialize round trip gives a deep copy, so
+			// mutating $model below never touches the cached raw_model().
+			$model       = json_decode( wp_json_encode( self::raw_model() ), true );
+			self::$model = self::apply_overrides( $model );
+		}
+
 		return self::$model;
+	}
+
+	/**
+	 * Layers admin-edited point values and feedback text on top of the
+	 * original model. A value is only overridden when it is numeric (for
+	 * ratings/thresholds) or non-blank (for feedback text) and - for arrays -
+	 * the count still matches the original, so a stale override left over
+	 * from a since-changed question can never desync scoring from the
+	 * question definitions in questions.json.
+	 */
+	private static function apply_overrides( $model ) {
+		$overrides = get_option( self::OPTION, array() );
+
+		if ( empty( $overrides ) || ! is_array( $overrides ) ) {
+			return $model;
+		}
+
+		if ( ! empty( $overrides['maturityLevels'] ) && is_array( $overrides['maturityLevels'] ) ) {
+			foreach ( $model['maturityLevels'] as &$level ) {
+				$key = (string) $level['level'];
+
+				// Level 1 always starts at 0 - not editable.
+				if ( $level['level'] > 1 && isset( $overrides['maturityLevels'][ $key ] ) && is_numeric( $overrides['maturityLevels'][ $key ] ) ) {
+					$level['minInclusive'] = (float) $overrides['maturityLevels'][ $key ];
+				}
+			}
+			unset( $level );
+		}
+
+		if ( isset( $overrides['denominator'] ) && is_numeric( $overrides['denominator'] ) ) {
+			$model['denominator'] = (float) $overrides['denominator'];
+
+			foreach ( $model['maturityLevels'] as &$level ) {
+				if ( 5 === $level['level'] ) {
+					$level['maxInclusive'] = $model['denominator'];
+				}
+			}
+			unset( $level );
+		}
+
+		// Each level's exclusive ceiling is the next level's floor - keep the
+		// chain consistent after any minInclusive overrides above.
+		usort(
+			$model['maturityLevels'],
+			function ( $a, $b ) {
+				return $a['level'] <=> $b['level'];
+			}
+		);
+
+		for ( $i = 0, $n = count( $model['maturityLevels'] ); $i < $n - 1; $i++ ) {
+			$model['maturityLevels'][ $i ]['maxExclusive'] = $model['maturityLevels'][ $i + 1 ]['minInclusive'];
+		}
+
+		if ( ! empty( $overrides['sections'] ) && is_array( $overrides['sections'] ) ) {
+			foreach ( $model['sections'] as $name => &$section ) {
+				if ( empty( $overrides['sections'][ $name ] ) || ! is_array( $overrides['sections'][ $name ] ) ) {
+					continue;
+				}
+
+				foreach ( array( 'L1', 'L2', 'L3', 'L4', 'L5' ) as $anchor_key ) {
+					if ( isset( $overrides['sections'][ $name ][ $anchor_key ] ) && is_numeric( $overrides['sections'][ $name ][ $anchor_key ] ) ) {
+						$section['anchors'][ $anchor_key ] = (float) $overrides['sections'][ $name ][ $anchor_key ];
+					}
+				}
+			}
+			unset( $section );
+		}
+
+		if ( ! empty( $overrides['questions'] ) && is_array( $overrides['questions'] ) ) {
+			foreach ( $model['questions'] as $id => &$q ) {
+				if ( empty( $overrides['questions'][ $id ] ) || ! is_array( $overrides['questions'][ $id ] ) ) {
+					continue;
+				}
+
+				self::apply_question_overrides( $q, $overrides['questions'][ $id ] );
+			}
+			unset( $q );
+		}
+
+		return $model;
+	}
+
+	private static function apply_question_overrides( &$q, $ov ) {
+		switch ( $q['kind'] ) {
+			case 'single':
+			case 'rating_position':
+			case 'erp_conditional':
+				self::apply_numeric_array( $q['ratings'], isset( $ov['ratings'] ) ? $ov['ratings'] : null );
+				self::apply_text_array( $q['feedback'], isset( $ov['feedback'] ) ? $ov['feedback'] : null );
+				break;
+
+			case 'multi_sum':
+				self::apply_numeric_array( $q['ratings'], isset( $ov['ratings'] ) ? $ov['ratings'] : null );
+
+				if ( isset( $ov['feedback'] ) && is_string( $ov['feedback'] ) && '' !== trim( $ov['feedback'] ) ) {
+					$q['feedback'] = $ov['feedback'];
+				}
+				break;
+
+			case 'grid_average':
+				self::apply_numeric_array( $q['columnRatings'], isset( $ov['columnRatings'] ) ? $ov['columnRatings'] : null );
+				self::apply_text_array( $q['feedback'], isset( $ov['feedback'] ) ? $ov['feedback'] : null );
+				break;
+
+			case 'likert_rows':
+				if ( ! empty( $ov['rows'] ) && is_array( $ov['rows'] ) ) {
+					foreach ( $q['rows'] as &$row ) {
+						$row_ov = isset( $ov['rows'][ $row['row'] ] ) ? $ov['rows'][ $row['row'] ] : null;
+
+						if ( ! is_array( $row_ov ) ) {
+							continue;
+						}
+
+						self::apply_numeric_array( $row['ratings'], isset( $row_ov['ratings'] ) ? $row_ov['ratings'] : null );
+						self::apply_text_array( $row['feedback'], isset( $row_ov['feedback'] ) ? $row_ov['feedback'] : null );
+					}
+					unset( $row );
+				}
+				break;
+		}
+
+		if ( isset( $q['otherRating'] ) && isset( $ov['otherRating'] ) && is_numeric( $ov['otherRating'] ) ) {
+			$q['otherRating'] = (float) $ov['otherRating'];
+		}
+
+		if ( isset( $q['otherFeedback'] ) && isset( $ov['otherFeedback'] ) && is_string( $ov['otherFeedback'] ) && '' !== trim( $ov['otherFeedback'] ) ) {
+			$q['otherFeedback'] = $ov['otherFeedback'];
+		}
+	}
+
+	/** Overwrites $target in place, index by index, only where $ov has a numeric value at that index and the lengths match. */
+	private static function apply_numeric_array( &$target, $ov ) {
+		if ( ! is_array( $ov ) || count( $ov ) !== count( $target ) ) {
+			return;
+		}
+
+		foreach ( $target as $i => $v ) {
+			if ( isset( $ov[ $i ] ) && is_numeric( $ov[ $i ] ) ) {
+				$target[ $i ] = (float) $ov[ $i ];
+			}
+		}
+	}
+
+	/** Same as apply_numeric_array() but for feedback text - only overwrites with non-blank strings. */
+	private static function apply_text_array( &$target, $ov ) {
+		if ( ! is_array( $ov ) || count( $ov ) !== count( $target ) ) {
+			return;
+		}
+
+		foreach ( $target as $i => $v ) {
+			if ( isset( $ov[ $i ] ) && is_string( $ov[ $i ] ) && '' !== trim( $ov[ $i ] ) ) {
+				$target[ $i ] = $ov[ $i ];
+			}
+		}
 	}
 
 	/**
