@@ -12,6 +12,11 @@
   --brs-r-accent: #83465b;
   --brs-r-radius: 10px;
   --brs-r-page: #eef1f6;
+  /* Same backdrop as the survey form (survey.css's --brs-page-gradient), so
+     the results page reads as a continuation of the same experience rather
+     than a different product. --brs-r-page itself stays a flat colour -
+     still used for small flat surfaces like the ghost-button hover below. */
+  --brs-r-page-gradient: linear-gradient(135deg, #aab4d9 0%, #b98ea3 45%, #e0935f 100%);
   --brs-r-font: system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   box-sizing: border-box;
@@ -19,7 +24,7 @@
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding: 0 1.5rem 2.5rem;
-  background: var(--brs-r-page);
+  background: var(--brs-r-page-gradient);
   color: var(--brs-r-ink);
   font-family: var(--brs-r-font);
   font-size: 1rem;
