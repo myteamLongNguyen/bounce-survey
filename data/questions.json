@@ -905,11 +905,11 @@
           "subtext": "",
           "required": true,
           "columns": [
-            "Reactive",
-            "Basic Compliance",
-            "Practised",
-            "Integrated",
-            "Leading Practice"
+            "(Very Low)",
+            "(Low)",
+            "(Moderate)",
+            "(High)",
+            "(Very High)"
           ],
           "rows": [
             "Business Continuity",

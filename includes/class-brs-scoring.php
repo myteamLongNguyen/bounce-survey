@@ -121,11 +121,13 @@ class BRS_Scoring {
 	}
 
 	/**
-	 * Top N scored items ranked by relative gap (1 - earned/max), for the
-	 * "Recommended Actions" panel. Items with no feedback text (nulls in the
-	 * source data) are skipped since there is nothing actionable to show.
+	 * Every scored item whose given answer carries feedback text, ranked by
+	 * relative gap (1 - earned/max), for the "Recommended Actions" panel.
+	 * Items with no feedback (nulls in the source data) are skipped since
+	 * there is nothing actionable to show - everything else is included, so
+	 * a respondent with many gaps sees all of them, not just a top few.
 	 */
-	public static function recommended_actions( array $scored, $limit = 4 ) {
+	public static function recommended_actions( array $scored ) {
 		$candidates = array_filter(
 			$scored['items'],
 			function ( $item ) {
@@ -142,7 +144,7 @@ class BRS_Scoring {
 			}
 		);
 
-		return array_slice( array_values( $candidates ), 0, $limit );
+		return array_values( $candidates );
 	}
 
 	/**

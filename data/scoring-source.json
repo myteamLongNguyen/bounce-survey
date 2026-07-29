@@ -22,11 +22,11 @@
     ]
   },
   "maturityLevels": [
-    { "level": 1, "key": "reactive", "label": "Reactive", "fullLabel": "Level 1 – Reactive (minimal planning, ad hoc response)", "minInclusive": 0, "maxExclusive": 105 },
-    { "level": 2, "key": "compliant", "label": "Basic Compliance", "fullLabel": "Level 2 – Compliant (plans exist, limited testing)", "minInclusive": 105, "maxExclusive": 285 },
-    { "level": 3, "key": "practised", "label": "Practised", "fullLabel": "Level 3 – Practised (regular drills, defined roles)", "minInclusive": 285, "maxExclusive": 332.5 },
-    { "level": 4, "key": "integrated", "label": "Integrated", "fullLabel": "Level 4 – Integrated (aligned EM, CIM, BC systems)", "minInclusive": 332.5, "maxExclusive": 364 },
-    { "level": 5, "key": "leading", "label": "Leading Practice", "fullLabel": "Level 5 – Leading (continuous improvement, data-driven)", "minInclusive": 364, "maxInclusive": 392.5 }
+    { "level": 1, "key": "reactive", "label": "Very Low", "fullLabel": "Level 1 – Reactive (minimal planning, ad hoc response)", "minInclusive": 0, "maxExclusive": 105 },
+    { "level": 2, "key": "compliant", "label": "Low", "fullLabel": "Level 2 – Compliant (plans exist, limited testing)", "minInclusive": 105, "maxExclusive": 285 },
+    { "level": 3, "key": "practised", "label": "Moderate", "fullLabel": "Level 3 – Practised (regular drills, defined roles)", "minInclusive": 285, "maxExclusive": 332.5 },
+    { "level": 4, "key": "integrated", "label": "High", "fullLabel": "Level 4 – Integrated (aligned EM, CIM, BC systems)", "minInclusive": 332.5, "maxExclusive": 364 },
+    { "level": 5, "key": "leading", "label": "Very High", "fullLabel": "Level 5 – Leading (continuous improvement, data-driven)", "minInclusive": 364, "maxInclusive": 392.5 }
   ],
   "sections": [
     { "name": "Governance and Leadership", "anchors": { "L1": 15, "L2": 55, "L3": 67.5, "L4": 75.5, "L5": 85 } },

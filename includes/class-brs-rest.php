@@ -84,7 +84,7 @@ class BRS_REST {
 				'submittedAt'    => $row->created_at,
 				'score'          => $scored,
 				'maturityLevels' => BRS_Scoring::model()['maturityLevels'],
-				'actions'        => self::actions_with_labels( BRS_Scoring::recommended_actions( $scored, 4 ) ),
+				'actions'        => self::actions_with_labels( BRS_Scoring::recommended_actions( $scored ) ),
 				'peers'          => BRS_Scoring::peer_summary( $row->reference, $row->total_score ),
 			),
 			200
