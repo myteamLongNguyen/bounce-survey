@@ -536,10 +536,7 @@ function Actions({ actions }) {
               {items.map((action, i) => (
                 <li key={action.id} className="brs-r-action">
                   <span className="brs-r-action-number">{i + 1}.</span>
-                  <span>
-                    <strong>{action.label}: </strong>
-                    {action.feedback}
-                  </span>
+                  <span>{action.feedback}</span>
                 </li>
               ))}
             </ol>
