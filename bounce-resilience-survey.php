@@ -22,6 +22,7 @@ require_once BRS_PATH . 'includes/class-brs-scoring.php';
 require_once BRS_PATH . 'includes/class-brs-onedrive.php';
 require_once BRS_PATH . 'includes/class-brs-rest.php';
 require_once BRS_PATH . 'includes/class-brs-admin.php';
+require_once BRS_PATH . 'includes/class-brs-reports.php';
 
 register_activation_hook( __FILE__, array( 'BRS_DB', 'install' ) );
 

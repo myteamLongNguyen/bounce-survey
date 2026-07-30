@@ -27,6 +27,7 @@ class BRS_Admin {
 		);
 
 		add_submenu_page( 'brs-submissions', 'Submissions', 'Submissions', self::CAPABILITY, 'brs-submissions', array( __CLASS__, 'render_submissions' ) );
+		add_submenu_page( 'brs-submissions', 'Response Overview', 'Response Overview', self::CAPABILITY, 'brs-reports', array( 'BRS_Reports', 'render' ) );
 		add_submenu_page( 'brs-submissions', 'Question wording', 'Question wording', self::CAPABILITY, 'brs-wording', array( __CLASS__, 'render_wording_editor' ) );
 		add_submenu_page( 'brs-submissions', 'Scoring & Feedback', 'Scoring & Feedback', self::CAPABILITY, 'brs-scoring', array( __CLASS__, 'render_scoring_editor' ) );
 		add_submenu_page( 'brs-submissions', 'OneDrive Sync', 'OneDrive Sync', self::CAPABILITY, 'brs-onedrive', array( __CLASS__, 'render_onedrive_settings' ) );

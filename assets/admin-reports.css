@@ -1,0 +1,146 @@
+.brs-reports-wrap .brs-report-cards {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.brs-report-card {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  padding: 16px 24px;
+  min-width: 160px;
+}
+
+.brs-report-card-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #16294f;
+  line-height: 1.2;
+}
+
+.brs-report-card-label {
+  display: block;
+  color: #646970;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.brs-report-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.brs-report-grid--top {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .brs-report-grid--top {
+    grid-template-columns: 1fr;
+  }
+}
+
+.brs-report-panel {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.brs-report-panel h2 {
+  margin-top: 0;
+}
+
+.brs-report-panel h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.brs-report-answered {
+  margin: 0 0 12px;
+  color: #646970;
+  font-size: 0.85rem;
+}
+
+.brs-report-avg {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+}
+
+.brs-report-empty {
+  color: #8c8f94;
+  font-style: italic;
+  margin: 0;
+}
+
+.brs-report-chart-wrap {
+  position: relative;
+  height: 220px;
+}
+
+.brs-report-chart-wrap--tall {
+  height: 320px;
+}
+
+.brs-report-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+  position: sticky;
+  top: 32px;
+  background: #f0f0f1;
+  padding: 10px 0;
+  z-index: 10;
+}
+
+.brs-report-nav a {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  text-decoration: none;
+  color: #16294f;
+  white-space: nowrap;
+}
+
+.brs-report-nav a:hover {
+  background: #16294f;
+  color: #fff;
+  border-color: #16294f;
+}
+
+.brs-report-section {
+  margin-bottom: 32px;
+  scroll-margin-top: 90px;
+}
+
+.brs-report-section > h2 {
+  border-bottom: 1px solid #c3c4c7;
+  padding-bottom: 8px;
+}
+
+.brs-report-text-list {
+  list-style: disc;
+  margin: 0 0 0 20px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.brs-report-text-list li {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f1;
+}
+
+.brs-report-text-list li:last-child {
+  border-bottom: none;
+}
