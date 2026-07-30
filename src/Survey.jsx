@@ -7,7 +7,7 @@ export default function Survey() {
   // Read at render time, not at module scope. ES module imports are evaluated
   // before the body of the module that imports them, so a top-level read here
   // would run before main.jsx has a chance to set up the dev mock.
-  const { restUrl, resultsUrlBase, nonce, survey, copy, banner } = window.BRS_DATA;
+  const { restUrl, resultsUrlBase, nonce, survey, copy, banner, logo } = window.BRS_DATA;
   const sections = survey.sections;
 
   // A reference in the URL (shared link, or a bookmark from a previous visit)
@@ -28,7 +28,7 @@ export default function Survey() {
   const section = sections[step];
 
   if (resultsRef) {
-    return <Results reference={resultsRef} restUrlBase={resultsUrlBase} onBack={() => setResultsRef(null)} />;
+    return <Results reference={resultsRef} restUrlBase={resultsUrlBase} onBack={() => setResultsRef(null)} logo={logo} />;
   }
 
   function setAnswer(id, value) {

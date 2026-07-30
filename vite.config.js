@@ -93,6 +93,16 @@ function fakeResults(reference) {
 
   const count = Math.max(1, actionPool.length - levelIndex * 2 - Math.floor(rand() * 2));
 
+  // Matches data/scoring.json's sections order - the real endpoint orders
+  // actions by this, then by gap within each section.
+  const sectionOrder = [
+    'Governance and Leadership',
+    'Emergency Management Preparedness',
+    'Critical Incident Management Capability',
+    'Business Continuity and Recovery',
+    'Communications Readiness',
+  ];
+
   return {
     reference,
     schoolName: 'Sample School (dev data)',
@@ -101,6 +111,7 @@ function fakeResults(reference) {
     maturityLevels: levels.map((l) => ({ level: l.level, label: l.label })),
     actions: shuffle(actionPool, rand)
       .slice(0, count)
+      .sort((a, b) => sectionOrder.indexOf(a.section) - sectionOrder.indexOf(b.section))
       .map((a) => ({ id: a.id, label: a.label, section: a.section, feedback: a.feedback })),
     peers: {
       sampleSize: 12,

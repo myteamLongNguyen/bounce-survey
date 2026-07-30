@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // Ordinal risk strip: red -> orange -> yellow -> green -> green. A 5-step
 // same-direction ramp packed this tightly cannot clear full CVD separation on
@@ -61,8 +63,9 @@ const LOADING_STEPS = [
  * response only carries the bare reference, and a returning visitor arrives
  * with nothing but the reference they typed into ReferenceLookupForm.
  */
-export default function Results({ reference, restUrlBase, onBack }) {
+export default function Results({ reference, restUrlBase, onBack, logo }) {
   const [state, setState] = useState({ status: 'loading', data: null, error: null });
+  const containerRef = useRef(null);
 
   useEffect(() => {
     setState({ status: 'loading', data: null, error: null });
@@ -115,11 +118,12 @@ export default function Results({ reference, restUrlBase, onBack }) {
   const { data } = state;
 
   return (
-    <div className="brs-results">
-      <Header data={data} onBack={onBack} />
+    <div className="brs-results" ref={containerRef}>
+      <Header data={data} onBack={onBack} logo={logo} />
       <BestPractice score={data.score} levels={data.maturityLevels} />
       <Peers peers={data.peers} levels={data.maturityLevels} />
       <Actions actions={data.actions} />
+      <Toolbar targetRef={containerRef} data={data} />
     </div>
   );
 }
@@ -146,8 +150,9 @@ function ResultsLoading() {
   );
 }
 
-// School/shield mark for the header - inline rather than a static asset, so
-// it renders crisp at any size without an extra file for WordPress to serve.
+// Fallback shield mark for the header, used only if the real Bounce Readiness
+// logo asset (assets/BOUNCECIRCLE_RGB_white.png) isn't available - keeps the
+// header from ever showing a broken image.
 function HeaderLogo() {
   return (
     <svg className="brs-r-logo" viewBox="0 0 500 500" role="img" aria-hidden="true">
@@ -205,7 +210,7 @@ function HeaderLogo() {
   );
 }
 
-function Header({ data, onBack }) {
+function Header({ data, onBack, logo }) {
   const date = data.submittedAt ? new Date(data.submittedAt.replace(' ', 'T')) : null;
   const dateLabel = date && !isNaN(date) ? date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
 
@@ -215,7 +220,7 @@ function Header({ data, onBack }) {
         <button type="button" className="brs-r-back-link" onClick={onBack}>
           &larr; Back
         </button>
-        <HeaderLogo />
+        {logo ? <img className="brs-r-logo" src={logo} alt="Bounce Readiness" /> : <HeaderLogo />}
         <div className="brs-r-header-titles">
           <h1>Your Results</h1>
           <p>School Operational Resilience Survey</p>
@@ -224,7 +229,7 @@ function Header({ data, onBack }) {
       <div className="brs-r-header-meta">
         <div>
           <span className="brs-r-header-label">School Name</span>
-          <span className="brs-r-header-value">{data.schoolName || '—'}</span>
+          <span className="brs-r-header-value brs-r-header-value--full">{data.schoolName || '—'}</span>
         </div>
         <div>
           <span className="brs-r-header-label">Date</span>
@@ -237,6 +242,84 @@ function Header({ data, onBack }) {
       </div>
     </header>
   );
+}
+
+// Snapshots the dashboard to canvas (html2canvas) and packs that into a real
+// PDF file (jsPDF) that saves straight to disk - window.print() only ever
+// hands control to the OS/browser print dialog, which isn't a "download" as
+// far as a non-technical respondent is concerned.
+function Toolbar({ targetRef, data }) {
+  const [generating, setGenerating] = useState(false);
+
+  async function handleDownload() {
+    if (!targetRef.current || generating) return;
+
+    setGenerating(true);
+
+    try {
+      await downloadResultsPdf(targetRef.current, data);
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  return (
+    <div className="brs-r-toolbar">
+      <button type="button" className="brs-r-btn brs-r-download-btn" onClick={handleDownload} disabled={generating}>
+        {generating ? 'Preparing PDF…' : 'Download PDF'}
+      </button>
+    </div>
+  );
+}
+
+// The toolbar and back-link only make sense on-screen - excluded from the
+// capture via onclone (hiding them on the *cloned* document html2canvas
+// renders from) rather than ignoreElements, so layout/positioning of
+// everything else is computed exactly as html2canvas would otherwise see it.
+async function downloadResultsPdf(node, data) {
+  const canvas = await html2canvas(node, {
+    scale: 2,
+    useCORS: true,
+    onclone: (clonedDoc) => {
+      clonedDoc.querySelectorAll('.brs-r-toolbar, .brs-r-back-link').forEach((el) => {
+        el.style.visibility = 'hidden';
+      });
+    },
+  });
+
+  // JPEG, not PNG: this is a photograph-like raster (gradients, anti-aliased
+  // text) rather than flat graphics, and PNG's lossless compression makes a
+  // multi-page capture at 2x scale balloon to tens of MB - JPEG at high
+  // quality is visually indistinguishable here at a fraction of the size.
+  const imgData = canvas.toDataURL('image/jpeg', 0.92);
+  const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pageWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  // Long dashboard, short page: slice the one tall image across as many
+  // pages as it needs by sliding it up (negative y) on each successive page,
+  // rather than trying to reflow/re-render per page.
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position -= pageHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  pdf.save(pdfFilename(data));
+}
+
+function pdfFilename(data) {
+  const school = (data.schoolName || 'Results').trim().replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '');
+  return `${school || 'Results'}-${data.reference}.pdf`;
 }
 
 function BestPractice({ score, levels }) {
@@ -386,9 +469,11 @@ function smoothPath(points) {
 function BellCurve({ peers, levels, revealed }) {
   const width = 640;
   // Bigger bottom margin than the curve itself needs, to stack: the marker
-  // dots, their direct "Peer Average" / "Your Score" labels, then the level
-  // ticks below that - three rows under the baseline.
-  const padding = { top: 10, right: 20, bottom: 70, left: 20 };
+  // dots, the "Your Score" label, then the level ticks below that - two rows
+  // under the baseline. Extra top margin fits "Peer Average" above the curve
+  // instead, so the two labels never collide when the markers sit close
+  // together.
+  const padding = { top: 32, right: 20, bottom: 70, left: 20 };
   const plotH = 88;
   const height = padding.top + plotH + padding.bottom;
   const plotW = width - padding.left - padding.right;
@@ -416,6 +501,10 @@ function BellCurve({ peers, levels, revealed }) {
 
   const meanX = x(peers.meanPosition ?? mean);
   const youX = x(peers.myPosition ?? mean);
+  // "Peer Average" sits above the curve, "Your Score" below the baseline -
+  // split across the two ends of the marker line so the labels can't
+  // overlap when the two markers land close together.
+  const peerLabelY = 14;
   const markerLabelY = baseline + 22;
   const tickTitleY = baseline + 42;
 
@@ -480,7 +569,7 @@ function BellCurve({ peers, levels, revealed }) {
           style={{ fill: YOU_COLOR, transformOrigin: `${youX}px ${baseline}px` }}
         />
 
-        <text x={meanX} y={markerLabelY} textAnchor="middle" className="brs-r-marker-label" style={{ fill: PEER_COLOR }}>
+        <text x={meanX} y={peerLabelY} textAnchor="middle" className="brs-r-marker-label" style={{ fill: PEER_COLOR }}>
           Peer Average
         </text>
         <text x={youX} y={markerLabelY} textAnchor="middle" className="brs-r-marker-label" style={{ fill: YOU_COLOR }}>
@@ -498,9 +587,10 @@ function BellCurve({ peers, levels, revealed }) {
   );
 }
 
-// Groups keep the items' existing gap-descending order, just split apart -
-// so within a section the worst gaps still come first, and the section with
-// the single worst item leads (Map preserves insertion/first-seen order).
+// Groups keep the items' existing order, just split apart - the backend
+// already orders `actions` by section (matching the survey's own section
+// order) then by gap severity within each section, and Map preserves
+// insertion/first-seen order, so that ordering carries straight through here.
 function groupBySection(actions) {
   const groups = new Map();
 

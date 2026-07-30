@@ -84,6 +84,8 @@ add_shortcode(
 				// serves it directly, so it works at whatever URL the plugin
 				// ends up installed at.
 				'banner'         => file_exists( BRS_PATH . 'assets/banner.png' ) ? BRS_URL . 'assets/banner.png' : '',
+				// Same static-file reasoning as banner above.
+				'logo'           => file_exists( BRS_PATH . 'assets/BOUNCECIRCLE_RGB_white.png' ) ? BRS_URL . 'assets/BOUNCECIRCLE_RGB_white.png' : '',
 			)
 		);
 

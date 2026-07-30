@@ -65,6 +65,7 @@
   flex: none;
   height: 5.5rem;
   width: 5.5rem;
+  object-fit: contain;
 }
 
 .brs-r-header-titles {
@@ -76,6 +77,9 @@
   font-size: 1.5rem;
   font-weight: 700;
   white-space: nowrap;
+  /* Explicit rather than relying on inherited color: the host theme's own
+     h1 styling has been observed to win over inheritance here. */
+  color: #fff !important;
 }
 
 .brs-r-header-titles p {
@@ -116,6 +120,15 @@
   white-space: nowrap;
   font-size: 0.95rem;
   font-weight: 600;
+}
+
+/* School Name should always show in full, unlike Date/Reference which are
+   fixed-width and fine to truncate. */
+.brs-r-header-value--full {
+  max-width: none;
+  overflow: visible;
+  white-space: normal;
+  word-break: break-word;
 }
 
 @media (max-width: 900px) {
@@ -572,4 +585,34 @@
 
 .brs-r-back-link:hover {
   color: #fff;
+}
+
+/* Toolbar (Download PDF) -------------------------------------------------- */
+
+.brs-r-toolbar {
+  max-width: 64rem;
+  margin: 1rem auto 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Print (Download PDF) ----------------------------------------------------- */
+
+@media print {
+  .brs-r-back-link,
+  .brs-r-toolbar,
+  .brs-r-lookup {
+    display: none !important;
+  }
+
+  .brs-results {
+    background: var(--brs-r-page-gradient);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .brs-r-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
 }

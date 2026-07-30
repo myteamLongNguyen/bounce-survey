@@ -19,6 +19,7 @@ async function boot() {
       survey,
       copy: COPY,
       banner: "/assets/banner.png",
+      logo: "/assets/BOUNCECIRCLE_RGB_white.png",
     };
   }
 

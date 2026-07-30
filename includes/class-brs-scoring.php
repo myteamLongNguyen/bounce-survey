@@ -298,13 +298,21 @@ class BRS_Scoring {
 	}
 
 	/**
-	 * Every scored item whose given answer carries feedback text, ranked by
-	 * relative gap (1 - earned/max), for the "Recommended Actions" panel.
-	 * Items with no feedback (nulls in the source data) are skipped since
-	 * there is nothing actionable to show - everything else is included, so
-	 * a respondent with many gaps sees all of them, not just a top few.
+	 * Every scored item whose given answer carries feedback text, for the
+	 * "Recommended Actions" panel. Ordered by section first - matching the
+	 * survey's own section order (Governance and Leadership, Emergency
+	 * Management Preparedness, Critical Incident Management Capability,
+	 * Business Continuity and Recovery, Communications Readiness) rather
+	 * than gap severity, since that's the order the client reviews actions
+	 * in - then by relative gap (1 - earned/max) within each section, worst
+	 * first. Items with no feedback (nulls in the source data) are skipped
+	 * since there is nothing actionable to show - everything else is
+	 * included, so a respondent with many gaps sees all of them, not just a
+	 * top few.
 	 */
 	public static function recommended_actions( array $scored ) {
+		$section_order = array_flip( array_keys( self::model()['sections'] ) );
+
 		$candidates = array_filter(
 			$scored['items'],
 			function ( $item ) {
@@ -314,7 +322,14 @@ class BRS_Scoring {
 
 		usort(
 			$candidates,
-			function ( $a, $b ) {
+			function ( $a, $b ) use ( $section_order ) {
+				$section_a = isset( $section_order[ $a['section'] ] ) ? $section_order[ $a['section'] ] : PHP_INT_MAX;
+				$section_b = isset( $section_order[ $b['section'] ] ) ? $section_order[ $b['section'] ] : PHP_INT_MAX;
+
+				if ( $section_a !== $section_b ) {
+					return $section_a <=> $section_b;
+				}
+
 				$gap_a = 1 - ( $a['earned'] / $a['max'] );
 				$gap_b = 1 - ( $b['earned'] / $b['max'] );
 				return $gap_b <=> $gap_a;
