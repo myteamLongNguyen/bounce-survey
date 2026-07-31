@@ -26,11 +26,21 @@ class BRS_Reports {
 	public static function render() {
 		$data = self::aggregate();
 
-		wp_enqueue_style( 'brs-reports', BRS_URL . 'assets/admin-reports.css', array(), BRS_VERSION );
+		// filemtime, not BRS_VERSION - these two files change on every plugin
+		// update, and a fixed version string would ask every browser/CDN/host
+		// cache to keep serving whatever copy they first fetched, forever,
+		// since the URL never changes. Same reasoning as the main plugin file's
+		// build/survey.js enqueue. The vendor libraries below are correctly
+		// pinned to their real release versions instead, since those files
+		// only change when we deliberately upgrade them.
+		$reports_css  = BRS_PATH . 'assets/admin-reports.css';
+		$reports_js   = BRS_PATH . 'assets/admin-reports.js';
+
+		wp_enqueue_style( 'brs-reports', BRS_URL . 'assets/admin-reports.css', array(), file_exists( $reports_css ) ? filemtime( $reports_css ) : BRS_VERSION );
 		wp_enqueue_script( 'brs-chartjs', BRS_URL . 'assets/vendor/chart.umd.min.js', array(), '4.5.1', true );
 		wp_enqueue_script( 'brs-html2canvas', BRS_URL . 'assets/vendor/html2canvas.min.js', array(), '1.4.1', true );
 		wp_enqueue_script( 'brs-jspdf', BRS_URL . 'assets/vendor/jspdf.umd.min.js', array(), '4.2.1', true );
-		wp_enqueue_script( 'brs-reports', BRS_URL . 'assets/admin-reports.js', array( 'brs-chartjs', 'brs-html2canvas', 'brs-jspdf' ), BRS_VERSION, true );
+		wp_enqueue_script( 'brs-reports', BRS_URL . 'assets/admin-reports.js', array( 'brs-chartjs', 'brs-html2canvas', 'brs-jspdf' ), file_exists( $reports_js ) ? filemtime( $reports_js ) : BRS_VERSION, true );
 		wp_add_inline_script( 'brs-reports', 'window.BRS_REPORT_DATA = ' . wp_json_encode( $data ) . ';', 'before' );
 		?>
 		<div class="wrap brs-reports-wrap">
