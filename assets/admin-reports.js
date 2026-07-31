@@ -203,7 +203,37 @@
   function downloadReportPdf(node) {
     var jsPDF = window.jspdf.jsPDF;
 
-    return html2canvas(node, { scale: 1.5, useCORS: true }).then(function (canvas) {
+    var options = {
+      scale: 1.5,
+      useCORS: true,
+      // html2canvas clones the whole document and crops to the target
+      // element's on-screen position, rather than only walking its DOM
+      // descendants - anything else occupying that same screen space (a
+      // fixed/sticky admin notice from an unrelated plugin, WordPress's own
+      // admin bar/sidebar/footer) can bleed into the capture even though
+      // it's not actually inside `node`. Hide all of that in the *cloned*
+      // document before it renders, same approach as the participant
+      // results page hiding its own Back button/toolbar.
+      onclone: function (clonedDoc) {
+        var selectors = [
+          '#wpadminbar',
+          '#adminmenumain',
+          '#adminmenuback',
+          '#adminmenuwrap',
+          '#wpfooter',
+          '.notice',
+          '.updated',
+          '.error',
+          '#brs-report-download',
+        ];
+
+        clonedDoc.querySelectorAll(selectors.join(',')).forEach(function (el) {
+          el.style.display = 'none';
+        });
+      },
+    };
+
+    return html2canvas(node, options).then(function (canvas) {
       var imgData = canvas.toDataURL('image/jpeg', 0.9);
       var pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
       var pageWidth = pdf.internal.pageSize.getWidth();
