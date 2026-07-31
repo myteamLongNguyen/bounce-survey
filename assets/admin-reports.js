@@ -231,9 +231,26 @@
 
   function wireDownloadButton() {
     var btn = document.getElementById('brs-report-download');
-    if (!btn || typeof html2canvas === 'undefined' || !window.jspdf) return;
+    if (!btn) {
+      console.warn('BRS Response Overview: #brs-report-download button not found on the page.');
+      return;
+    }
 
     btn.addEventListener('click', function () {
+      // Checked here, not by silently skipping addEventListener above - a
+      // missing dependency should fail loudly (console + visible message),
+      // not leave the button attached but inert with zero indication why.
+      if (typeof html2canvas === 'undefined' || !window.jspdf) {
+        console.error(
+          'BRS Response Overview PDF export: html2canvas and/or jsPDF failed to load.',
+          { html2canvas: typeof html2canvas, jspdf: typeof window.jspdf }
+        );
+        window.alert(
+          'Could not generate the PDF: a required script (html2canvas or jsPDF) did not load. Check the browser console for details, and confirm assets/vendor/html2canvas.min.js and assets/vendor/jspdf.umd.min.js were uploaded with the plugin.'
+        );
+        return;
+      }
+
       btn.disabled = true;
       var originalText = btn.textContent;
       btn.textContent = 'Preparing PDF…';
