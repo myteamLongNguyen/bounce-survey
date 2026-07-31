@@ -28,11 +28,18 @@ class BRS_Reports {
 
 		wp_enqueue_style( 'brs-reports', BRS_URL . 'assets/admin-reports.css', array(), BRS_VERSION );
 		wp_enqueue_script( 'brs-chartjs', BRS_URL . 'assets/vendor/chart.umd.min.js', array(), '4.5.1', true );
-		wp_enqueue_script( 'brs-reports', BRS_URL . 'assets/admin-reports.js', array( 'brs-chartjs' ), BRS_VERSION, true );
+		wp_enqueue_script( 'brs-html2canvas', BRS_URL . 'assets/vendor/html2canvas.min.js', array(), '1.4.1', true );
+		wp_enqueue_script( 'brs-jspdf', BRS_URL . 'assets/vendor/jspdf.umd.min.js', array(), '4.2.1', true );
+		wp_enqueue_script( 'brs-reports', BRS_URL . 'assets/admin-reports.js', array( 'brs-chartjs', 'brs-html2canvas', 'brs-jspdf' ), BRS_VERSION, true );
 		wp_add_inline_script( 'brs-reports', 'window.BRS_REPORT_DATA = ' . wp_json_encode( $data ) . ';', 'before' );
 		?>
 		<div class="wrap brs-reports-wrap">
-			<h1>Response Overview</h1>
+			<h1 class="wp-heading-inline">Response Overview</h1>
+
+			<?php if ( $data['totalResponses'] > 0 ) : ?>
+				<button type="button" id="brs-report-download" class="page-title-action">Download PDF</button>
+			<?php endif; ?>
+
 			<p class="description">
 				A live summary across all <?php echo esc_html( number_format_i18n( $data['totalResponses'] ) ); ?> submission(s) -
 				identifying fields (name, email, phone, school name) are never included here; view an individual

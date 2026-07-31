@@ -179,6 +179,85 @@
     else if ('rating' === q.kind) renderRatingQuestion(canvas, q);
   }
 
+  // Forces every not-yet-rendered question chart to draw immediately, for
+  // the "Download PDF" flow - the lazy IntersectionObserver below is exactly
+  // wrong there, since a screenshot needs every chart drawn up front, not
+  // only the ones that happen to have scrolled into view yet. Chart.getChart
+  // is Chart.js's own registry lookup, so this is safe to call on a canvas
+  // that's already been rendered (no double-instantiation).
+  function renderAllQuestionCharts() {
+    document.querySelectorAll('canvas[data-brs-chart="question"]').forEach(function (canvas) {
+      if (!Chart.getChart(canvas)) {
+        renderQuestionChart(canvas);
+      }
+    });
+  }
+
+  // Same rationale as Results.jsx's PDF export: a real downloaded file
+  // (html2canvas snapshot -> jsPDF, JPEG rather than PNG to keep file size
+  // sane) rather than window.print(), which just opens the OS print dialog
+  // instead of actually downloading anything. Scale is lower here than the
+  // participant dashboard's export (1.5 vs 2) since this page runs to many
+  // times the length - a full-size 2x capture would produce an unworkably
+  // large image for very little visible quality gain in a chart-heavy report.
+  function downloadReportPdf(node) {
+    var jsPDF = window.jspdf.jsPDF;
+
+    return html2canvas(node, { scale: 1.5, useCORS: true }).then(function (canvas) {
+      var imgData = canvas.toDataURL('image/jpeg', 0.9);
+      var pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
+      var pageWidth = pdf.internal.pageSize.getWidth();
+      var pageHeight = pdf.internal.pageSize.getHeight();
+      var imgWidth = pageWidth;
+      var imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      var heightLeft = imgHeight;
+      var position = 0;
+
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      var today = new Date().toISOString().slice(0, 10);
+      pdf.save('Response-Overview-' + today + '.pdf');
+    });
+  }
+
+  function wireDownloadButton() {
+    var btn = document.getElementById('brs-report-download');
+    if (!btn || typeof html2canvas === 'undefined' || !window.jspdf) return;
+
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      var originalText = btn.textContent;
+      btn.textContent = 'Preparing PDF…';
+
+      renderAllQuestionCharts();
+
+      // One frame so every newly-created chart actually paints before the
+      // capture runs - html2canvas reads the live rendered canvas pixels,
+      // not chart data, so it would otherwise screenshot blank canvases.
+      requestAnimationFrame(function () {
+        setTimeout(function () {
+          downloadReportPdf(document.querySelector('.brs-reports-wrap'))
+            .catch(function (err) {
+              window.alert('Could not generate the PDF: ' + err.message);
+            })
+            .then(function () {
+              btn.disabled = false;
+              btn.textContent = originalText;
+            });
+        }, 300);
+      });
+    });
+  }
+
   function ready(fn) {
     if (document.readyState !== 'loading') fn();
     else document.addEventListener('DOMContentLoaded', fn);
@@ -202,23 +281,24 @@
     if (!('IntersectionObserver' in window)) {
       // Fallback for older browsers: just render everything up front.
       questionCanvases.forEach(renderQuestionChart);
-      return;
+    } else {
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              renderQuestionChart(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { rootMargin: '200px 0px' }
+      );
+
+      questionCanvases.forEach(function (canvas) {
+        observer.observe(canvas);
+      });
     }
 
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            renderQuestionChart(entry.target);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { rootMargin: '200px 0px' }
-    );
-
-    questionCanvases.forEach(function (canvas) {
-      observer.observe(canvas);
-    });
+    wireDownloadButton();
   });
 })();

@@ -33,6 +33,46 @@ class BRS_Admin {
 		add_submenu_page( 'brs-submissions', 'OneDrive Sync', 'OneDrive Sync', self::CAPABILITY, 'brs-onedrive', array( __CLASS__, 'render_onedrive_settings' ) );
 	}
 
+	/**
+	 * Finds the front-end page containing [bounce_survey], so admin screens
+	 * can link straight to a submission's public results view (?ref=...)
+	 * without a separate settings field to keep in sync manually. Cached in
+	 * a transient since this is a full content search across posts/pages -
+	 * cheap to compute once, no reason to repeat it on every admin request.
+	 *
+	 * @return string|null
+	 */
+	private static function survey_page_url() {
+		$cached = get_transient( 'brs_survey_page_url' );
+
+		if ( false !== $cached ) {
+			return $cached ? $cached : null;
+		}
+
+		$posts = get_posts(
+			array(
+				's'              => '[bounce_survey',
+				'post_type'      => array( 'page', 'post' ),
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'fields'         => 'ids',
+			)
+		);
+
+		$url = ! empty( $posts ) ? get_permalink( $posts[0] ) : '';
+
+		set_transient( 'brs_survey_page_url', $url, 12 * HOUR_IN_SECONDS );
+
+		return $url ? $url : null;
+	}
+
+	/** The public results-view URL for one submission, or null if the survey page couldn't be found. */
+	private static function results_url( $reference ) {
+		$page = self::survey_page_url();
+
+		return $page ? add_query_arg( 'ref', rawurlencode( $reference ), $page ) : null;
+	}
+
 	public static function render_submissions() {
 		if ( isset( $_GET['ref'] ) ) {
 			self::render_single( sanitize_text_field( wp_unslash( $_GET['ref'] ) ) );
@@ -66,19 +106,21 @@ class BRS_Admin {
 						<th>Role</th>
 						<th>Country</th>
 						<th>Email</th>
+						<th>Results</th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php if ( empty( $rows ) ) : ?>
-						<tr><td colspan="8">No submissions yet. Once the survey page is live, responses will appear here.</td></tr>
+						<tr><td colspan="9">No submissions yet. Once the survey page is live, responses will appear here.</td></tr>
 					<?php endif; ?>
 
 					<?php
 					foreach ( $rows as $row ) :
-						$a          = json_decode( $row->answers, true );
-						$url        = add_query_arg( array( 'page' => 'brs-submissions', 'ref' => $row->reference ), admin_url( 'admin.php' ) );
-						$delete_url = wp_nonce_url(
+						$a           = json_decode( $row->answers, true );
+						$url         = add_query_arg( array( 'page' => 'brs-submissions', 'ref' => $row->reference ), admin_url( 'admin.php' ) );
+						$results_url = null !== $row->total_score ? self::results_url( $row->reference ) : null;
+						$delete_url  = wp_nonce_url(
 							admin_url( 'admin-post.php?action=brs_delete_submission&ref=' . rawurlencode( $row->reference ) ),
 							'brs_delete_submission_' . $row->reference
 						);
@@ -91,6 +133,13 @@ class BRS_Admin {
 							<td><?php echo esc_html( isset( $a['q2'] ) ? $a['q2'] : '-' ); ?></td>
 							<td><?php echo esc_html( isset( $a['q7'] ) ? $a['q7'] : '-' ); ?></td>
 							<td><?php echo esc_html( $row->email ? $row->email : '-' ); ?></td>
+							<td>
+								<?php if ( $results_url ) : ?>
+									<a href="<?php echo esc_url( $results_url ); ?>" target="_blank" rel="noopener noreferrer">View / download PDF</a>
+								<?php else : ?>
+									-
+								<?php endif; ?>
+							</td>
 							<td>
 								<a
 									href="<?php echo esc_url( $delete_url ); ?>"
@@ -140,8 +189,12 @@ class BRS_Admin {
 			'brs_delete_submission_' . $row->reference
 		);
 		?>
+		<?php $results_url = null !== $row->total_score ? self::results_url( $row->reference ) : null; ?>
 		<div class="wrap">
 			<h1 class="wp-heading-inline">Submission <code><?php echo esc_html( $row->reference ); ?></code></h1>
+			<?php if ( $results_url ) : ?>
+				<a href="<?php echo esc_url( $results_url ); ?>" class="page-title-action" target="_blank" rel="noopener noreferrer">View / download results PDF</a>
+			<?php endif; ?>
 			<a
 				href="<?php echo esc_url( $delete_url ); ?>"
 				class="page-title-action"
