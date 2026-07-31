@@ -1032,14 +1032,13 @@
           "id": "q56",
           "number": 56,
           "type": "multiple",
-          "text": "Would you be willing to participate in a follow-up interview or workshop, and receive a report with recommendations and regular updates from this research project?",
+          "text": "Would you be willing to participate in a follow-up interview or workshop, and receive regular updates from this research project?",
           "subtext": "",
           "note": "Providing your contact details is optional. If you prefer to remain anonymous, you can leave these fields blank and your response will still count toward the Operational Resilience in Schools Benchmarking Initiative.",
           "required": true,
           "options": [
             "Follow-up Interview",
             "Workshop",
-            "Receive a report with recommendations",
             "Regular updates and findings from this research project",
             "None of the above"
           ]
