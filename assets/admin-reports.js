@@ -230,6 +230,17 @@
         clonedDoc.querySelectorAll(selectors.join(',')).forEach(function (el) {
           el.style.display = 'none';
         });
+
+        // Open-text answer lists scroll on screen (brs-report-text-list has
+        // a fixed max-height) so they don't take over the page - but
+        // html2canvas only captures what's actually rendered, not what's
+        // reachable by scrolling, so left as-is the PDF would silently drop
+        // every response past the scroll cutoff. Expand them fully just for
+        // the capture.
+        clonedDoc.querySelectorAll('.brs-report-text-list').forEach(function (el) {
+          el.style.maxHeight = 'none';
+          el.style.overflow = 'visible';
+        });
       },
     };
 

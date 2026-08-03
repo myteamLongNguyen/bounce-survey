@@ -189,9 +189,19 @@ class BRS_Admin {
 			'brs_delete_submission_' . $row->reference
 		);
 		?>
-		<?php $results_url = null !== $row->total_score ? self::results_url( $row->reference ) : null; ?>
-		<div class="wrap">
+		<?php
+		$results_url = null !== $row->total_score ? self::results_url( $row->reference ) : null;
+
+		$js = BRS_PATH . 'assets/admin-submission-pdf.js';
+
+		wp_enqueue_script( 'brs-html2canvas', BRS_URL . 'assets/vendor/html2canvas.min.js', array(), '1.4.1', true );
+		wp_enqueue_script( 'brs-jspdf', BRS_URL . 'assets/vendor/jspdf.umd.min.js', array(), '4.2.1', true );
+		wp_enqueue_script( 'brs-submission-pdf', BRS_URL . 'assets/admin-submission-pdf.js', array( 'brs-html2canvas', 'brs-jspdf' ), file_exists( $js ) ? filemtime( $js ) : BRS_VERSION, true );
+		wp_add_inline_script( 'brs-submission-pdf', 'window.BRS_SUBMISSION_REF = ' . wp_json_encode( $row->reference ) . ';', 'before' );
+		?>
+		<div class="wrap brs-submission-detail">
 			<h1 class="wp-heading-inline">Submission <code><?php echo esc_html( $row->reference ); ?></code></h1>
+			<button type="button" id="brs-submission-download" class="page-title-action">Download PDF</button>
 			<?php if ( $results_url ) : ?>
 				<a href="<?php echo esc_url( $results_url ); ?>" class="page-title-action" target="_blank" rel="noopener noreferrer">View / download results PDF</a>
 			<?php endif; ?>
@@ -201,7 +211,7 @@ class BRS_Admin {
 				onclick="return confirm('Delete submission <?php echo esc_js( $row->reference ); ?>? This cannot be undone.');"
 			>Delete</a>
 			<p>
-				<a href="<?php echo esc_url( $back ); ?>">&larr; Back to submissions</a> &middot;
+				<a href="<?php echo esc_url( $back ); ?>" class="brs-admin-back-link">&larr; Back to submissions</a> &middot;
 				Submitted <?php echo esc_html( $row->created_at ); ?>
 				<?php if ( $row->email ) : ?>
 					&middot; <?php echo esc_html( $row->email ); ?>
