@@ -23,6 +23,7 @@ require_once BRS_PATH . 'includes/class-brs-onedrive.php';
 require_once BRS_PATH . 'includes/class-brs-rest.php';
 require_once BRS_PATH . 'includes/class-brs-admin.php';
 require_once BRS_PATH . 'includes/class-brs-reports.php';
+require_once BRS_PATH . 'includes/class-brs-scheduled-report.php';
 
 register_activation_hook( __FILE__, array( 'BRS_DB', 'install' ) );
 
@@ -35,6 +36,15 @@ add_action( 'admin_post_brs_export_csv', array( 'BRS_Admin', 'handle_export_csv'
 add_action( 'admin_post_brs_delete_submission', array( 'BRS_Admin', 'handle_delete_submission' ) );
 add_action( 'admin_post_brs_save_onedrive_settings', array( 'BRS_Admin', 'handle_save_onedrive_settings' ) );
 add_action( 'admin_post_brs_onedrive_test_push', array( 'BRS_Admin', 'handle_onedrive_test_push' ) );
+add_action( 'admin_post_brs_save_scheduled_report', array( 'BRS_Scheduled_Report', 'handle_save' ) );
+add_action( 'admin_post_brs_send_test_report', array( 'BRS_Scheduled_Report', 'handle_test_send' ) );
+
+/**
+ * Registers the custom weekly/monthly cron intervals and the report-sending
+ * cron callback - unconditional (not just in wp-admin), since WP-Cron's
+ * pseudo-cron mechanism checks for due events on any front-end page load too.
+ */
+BRS_Scheduled_Report::init();
 
 /**
  * Scheduled (not run inline) so a respondent's submit request returns

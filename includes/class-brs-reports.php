@@ -150,7 +150,7 @@ class BRS_Reports {
 	 * single in-memory pass is simpler and fast enough, vs. SQL aggregation
 	 * over a JSON blob column.
 	 */
-	private static function aggregate() {
+	public static function aggregate() {
 		$rows  = BRS_DB::get_all();
 		$total = count( $rows );
 
