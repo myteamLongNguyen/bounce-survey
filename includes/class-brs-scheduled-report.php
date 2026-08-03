@@ -243,7 +243,29 @@ class BRS_Scheduled_Report {
 		$data = BRS_Reports::aggregate();
 		$html = self::render_html( $data );
 
-		$pdf = new \TCPDF( 'P', 'pt', 'A4', true, 'UTF-8', false );
+		// Non-Unicode ("core fonts") mode, not the default UTF-8/Unicode mode -
+		// Unicode mode makes TCPDF read its bundled Unicode-capable font files
+		// from disk on every generation (found the hard way: this alone was
+		// enough to trip a shared host's I/O resource limit and get the whole
+		// request killed, with nothing reaching PHP's own error log since it's
+		// an infrastructure-level kill, not a catchable PHP error). Core fonts
+		// mode uses the 14 standard PDF fonts every viewer already ships with,
+		// so no font files are read from disk at all.
+		//
+		// ISO-8859-1 can't represent every UTF-8 character though (question
+		// text alone has en-dashes in number ranges like "300-499 students",
+		// and open-text answers can contain anything a respondent typed -
+		// curly quotes, emoji, accented names). Feeding raw UTF-8 bytes to an
+		// ISO-8859-1-mode renderer without converting first doesn't error, it
+		// silently mangles into mojibake ("300-499" became "300a€"499"),
+		// which is worse than an error since it ships wrong-looking output
+		// unnoticed. Transliterating to the nearest ASCII equivalent first
+		// (dropping anything with no equivalent, e.g. emoji) keeps the I/O
+		// win from core-fonts mode without corrupting real content.
+		$html = self::to_latin1( $html );
+
+		$pdf = new \TCPDF( 'P', 'pt', 'A4', false, 'ISO-8859-1', false );
+		$pdf->SetFont( 'helvetica', '', 11 );
 		$pdf->SetCreator( 'Bounce Resilience Survey' );
 		$pdf->SetPrintHeader( false );
 		$pdf->SetPrintFooter( false );
@@ -253,6 +275,32 @@ class BRS_Scheduled_Report {
 		$pdf->writeHTML( $html, true, false, true, false, '' );
 
 		return $pdf->Output( '', 'S' );
+	}
+
+	/**
+	 * UTF-8 -> ISO-8859-1, transliterating what it can (en-dash -> hyphen,
+	 * curly quotes -> straight, accented letters -> unaccented) and dropping
+	 * what it can't (emoji etc.) rather than corrupting into mojibake. Tries
+	 * iconv first, falls back to mbstring, and if genuinely neither extension
+	 * is present, strips to plain ASCII as a last resort - degraded (accents
+	 * lost) but never a fatal error and never garbled output.
+	 */
+	private static function to_latin1( $html ) {
+		if ( function_exists( 'iconv' ) ) {
+			$converted = @iconv( 'UTF-8', 'ISO-8859-1//TRANSLIT//IGNORE', $html );
+			if ( false !== $converted ) {
+				return $converted;
+			}
+		}
+
+		if ( function_exists( 'mb_convert_encoding' ) ) {
+			$converted = @mb_convert_encoding( $html, 'ISO-8859-1', 'UTF-8' );
+			if ( false !== $converted ) {
+				return $converted;
+			}
+		}
+
+		return preg_replace( '/[^\x00-\x7F]/', '', $html );
 	}
 
 	private static function color_at( $i ) {
