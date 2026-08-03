@@ -228,22 +228,31 @@ class BRS_Scheduled_Report {
 		return $sent;
 	}
 
+	/**
+	 * TCPDF, not dompdf - dompdf 3.x (the only branch with its known security
+	 * advisories patched) requires PHP 8.1+, which is newer than this site
+	 * runs; every dompdf 2.x release remains flagged by Composer's security
+	 * audit and was never patched. TCPDF has no such advisories and supports
+	 * PHP back to 7.x, at the cost of a much simpler HTML/CSS subset - most
+	 * relevantly, no CSS position:absolute support, which is why the stacked
+	 * likert bars below use a single-row percentage-width table instead.
+	 */
 	public static function generate_pdf() {
 		require_once BRS_PATH . 'vendor/autoload.php';
 
 		$data = BRS_Reports::aggregate();
 		$html = self::render_html( $data );
 
-		$options = new \Dompdf\Options();
-		$options->set( 'isRemoteEnabled', false );
-		$options->set( 'defaultFont', 'Helvetica' );
+		$pdf = new \TCPDF( 'P', 'pt', 'A4', true, 'UTF-8', false );
+		$pdf->SetCreator( 'Bounce Resilience Survey' );
+		$pdf->SetPrintHeader( false );
+		$pdf->SetPrintFooter( false );
+		$pdf->SetMargins( 28, 28, 28 );
+		$pdf->SetAutoPageBreak( true, 28 );
+		$pdf->AddPage();
+		$pdf->writeHTML( $html, true, false, true, false, '' );
 
-		$dompdf = new \Dompdf\Dompdf( $options );
-		$dompdf->loadHtml( $html );
-		$dompdf->setPaper( 'A4', 'portrait' );
-		$dompdf->render();
-
-		return $dompdf->output();
+		return $pdf->Output( '', 'S' );
 	}
 
 	private static function color_at( $i ) {
@@ -256,7 +265,7 @@ class BRS_Scheduled_Report {
 
 		return '<tr>'
 			. '<td class="bar-label">' . esc_html( $label ) . '</td>'
-			. '<td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:' . $pct . '%;background:' . esc_attr( $color ) . ';"></div></div></td>'
+			. '<td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:' . $pct . '%;background-color:' . esc_attr( $color ) . ';"></div></div></td>'
 			. '<td class="bar-count">' . esc_html( number_format_i18n( $count ) ) . '</td>'
 			. '</tr>';
 	}
@@ -281,9 +290,7 @@ class BRS_Scheduled_Report {
 			h1 { color: #fff; margin: 0; font-size: 20px; }
 			h2 { color: <?php echo self::NAVY; ?>; font-size: 15px; margin: 24px 0 8px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
 			h3 { font-size: 12px; margin: 14px 0 4px; }
-			.header { background: <?php echo self::NAVY; ?>; padding: 14px 18px; }
-			.header table { width: 100%; }
-			.header img { height: 40px; }
+			.header { background-color: <?php echo self::NAVY; ?>; padding: 14px 18px; }
 			.meta { color: #666; font-size: 10px; margin: 0 0 16px; }
 			.cards { width: 100%; margin-bottom: 10px; }
 			.cards td { width: 33%; padding: 8px 12px; }
@@ -295,14 +302,15 @@ class BRS_Scheduled_Report {
 			.bar-label { width: 45%; font-size: 10px; }
 			.bar-cell { width: 40%; }
 			.bar-count { width: 15%; text-align: right; font-size: 10px; }
-			.bar-track { background: #eee; height: 10px; width: 100%; }
+			.bar-track { background-color: #eeeeee; height: 10px; width: 100%; }
 			.bar-fill { height: 10px; }
 			.answered { color: #666; font-size: 9px; margin: 0 0 4px; }
-			.question-block { page-break-inside: avoid; margin-bottom: 12px; }
-			.stacked { position: relative; width: 100%; height: 14px; background: #eee; margin-bottom: 2px; overflow: hidden; }
-			.stacked-seg { position: absolute; top: 0; height: 14px; }
+			.question-block { margin-bottom: 12px; }
+			table.stacked { width: 100%; border-collapse: collapse; margin-bottom: 2px; }
+			table.stacked td { height: 14px; }
 			.legend { font-size: 8px; color: #555; margin-bottom: 10px; }
 			.legend span { margin-right: 10px; }
+			.legend-swatch { font-size: 6px; }
 			ul.responses { margin: 0 0 8px 16px; padding: 0; }
 			ul.responses li { margin-bottom: 4px; }
 		</style>
@@ -376,33 +384,39 @@ class BRS_Scheduled_Report {
 					<?php elseif ( 'likert' === $q['kind'] ) : ?>
 						<div class="legend">
 							<?php foreach ( $q['columns'] as $i => $col ) : ?>
-								<span style="color:<?php echo esc_attr( self::color_at( $i ) ); ?>;">&#9632; <?php echo esc_html( $col ); ?></span>
+								<span><span class="legend-swatch" style="background-color:<?php echo esc_attr( self::color_at( $i ) ); ?>;">&nbsp;&nbsp;</span> <?php echo esc_html( $col ); ?></span>
 							<?php endforeach; ?>
 						</div>
 						<?php foreach ( $q['rows'] as $row ) : ?>
 							<p style="margin:4px 0 1px;font-size:10px;"><?php echo esc_html( $row['label'] ); ?></p>
-							<div class="stacked">
-								<?php
-								// Absolutely positioned by a running left offset, not
-								// display:inline-block flow - independently-rounded
-								// percentages can sum to just over 100% (each of 5
-								// columns rounds up slightly), which pushed the last
-								// segment onto its own line under inline-block. Absolute
-								// positioning can't wrap, so that rounding slop is
-								// harmless here (worst case a sliver hangs 1-2px past
-								// the container edge, invisible under overflow:hidden).
-								$left = 0;
-								foreach ( $q['columns'] as $i => $col ) {
-									$n   = isset( $row['counts'][ $col ] ) ? $row['counts'][ $col ] : 0;
-									$pct = $row['answered'] > 0 ? round( ( $n / $row['answered'] ) * 100, 2 ) : 0;
-									if ( $pct <= 0 ) {
-										continue;
-									}
-									echo '<div class="stacked-seg" style="left:' . $left . '%;width:' . $pct . '%;background:' . esc_attr( self::color_at( $i ) ) . ';"></div>'; // phpcs:ignore
-									$left += $pct;
+							<?php
+							// A single-row table with percentage-width cells, not
+							// position:absolute divs - TCPDF's HTML support has no
+							// CSS positioning, absolutely-positioned segments just
+							// collapse into normal block flow (stacking vertically
+							// instead of overlaying horizontally). A table's cell
+							// widths are TCPDF-native and tolerate the same rounding
+							// slop harmlessly (browsers/TCPDF both just fit cells to
+							// the row rather than wrapping or overflowing).
+							$segments = array();
+							foreach ( $q['columns'] as $i => $col ) {
+								$n   = isset( $row['counts'][ $col ] ) ? $row['counts'][ $col ] : 0;
+								$pct = $row['answered'] > 0 ? round( ( $n / $row['answered'] ) * 100, 2 ) : 0;
+								if ( $pct > 0 ) {
+									$segments[] = array( 'pct' => $pct, 'color' => self::color_at( $i ) );
 								}
-								?>
-							</div>
+							}
+							if ( empty( $segments ) ) {
+								$segments[] = array( 'pct' => 100, 'color' => '#eeeeee' );
+							}
+							?>
+							<table class="stacked" cellspacing="0" cellpadding="0">
+								<tr>
+									<?php foreach ( $segments as $seg ) : ?>
+										<td width="<?php echo esc_attr( $seg['pct'] ); ?>%" style="background-color:<?php echo esc_attr( $seg['color'] ); ?>;">&nbsp;</td>
+									<?php endforeach; ?>
+								</tr>
+							</table>
 						<?php endforeach; ?>
 
 					<?php elseif ( 'rating' === $q['kind'] ) : ?>
