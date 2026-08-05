@@ -209,8 +209,16 @@ class BRS_Scheduled_Report {
 	public static function send_to( array $recipients ) {
 		$pdf_bytes = self::generate_pdf();
 
+		// wp_tempnam() always forces a .tmp extension onto whatever name we pass
+		// it, regardless of the extension we ask for - so swap it for a real
+		// .pdf path before writing the file. Mail clients (Outlook in
+		// particular) refuse to offer open/download options for an attachment
+		// with an unrecognized .tmp extension, especially from an
+		// external/unverified sender.
 		$tmp_file = wp_tempnam( 'brs-response-overview.pdf' );
-		file_put_contents( $tmp_file, $pdf_bytes );
+		$pdf_file = preg_replace( '/\.tmp$/', '.pdf', $tmp_file );
+		wp_delete_file( $tmp_file );
+		file_put_contents( $pdf_file, $pdf_bytes );
 
 		$site_name = get_bloginfo( 'name' );
 		$today     = current_time( 'Y-m-d' );
@@ -220,10 +228,10 @@ class BRS_Scheduled_Report {
 			sprintf( '%s - Response Overview (%s)', $site_name, $today ),
 			"Attached is the latest Response Overview report for the Operational Resilience Survey.\n\nThis is an automated message.",
 			array(),
-			array( $tmp_file )
+			array( $pdf_file )
 		);
 
-		wp_delete_file( $tmp_file );
+		wp_delete_file( $pdf_file );
 
 		return $sent;
 	}
@@ -238,7 +246,13 @@ class BRS_Scheduled_Report {
 	 * likert bars below use a single-row percentage-width table instead.
 	 */
 	public static function generate_pdf() {
-		require_once BRS_PATH . 'vendor/autoload.php';
+		// A direct require of TCPDF's own entry file, not Composer's vendor/
+		// autoloader - TCPDF is a self-contained library that doesn't use
+		// Composer's autoloading at all internally (it just requires its own
+		// files by relative path), so there's nothing Composer's machinery
+		// actually buys us here, and this sidesteps depending on vendor/
+		// existing intact at all.
+		require_once BRS_PATH . 'includes/lib/tcpdf/tcpdf.php';
 
 		$data = BRS_Reports::aggregate();
 		$html = self::render_html( $data );
